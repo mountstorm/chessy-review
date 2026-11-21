@@ -7,6 +7,7 @@ from fastapi import APIRouter, HTTPException, Request
 
 from ..coach.tools import parse_move
 from ..engine import motifs as mt
+from ..engine.scope import engine_scope
 from ..engine.visuals import arrow, position_visuals
 from ..models.schemas import EvaluateRequest
 
@@ -27,13 +28,14 @@ async def evaluate(body: EvaluateRequest, request: Request) -> Dict[str, Any]:
                                      f"(legal: {', '.join(board.san(m) for m in board.legal_moves)})")
         played.append(board.san(mv))
         board.push(mv)
-    depth = min(body.depth, st.settings.max_depth)
-    hits_before = getattr(st.pool.cache, "hits", 0)
-    ev = await st.pool.analyse(board, depth, body.multipv)
+    depth = min(body.depth, st.settings.hosted_max_depth if st.settings.hosted else st.settings.max_depth)
+    hits_before = getattr(st.cache, "hits", 0)
+    async with engine_scope(request.app) as pool:
+        ev = await pool.analyse(board, depth, body.multipv)
     stm = board.turn
     return {
         "fen": board.fen(), "played": played, "side_to_move": chess.COLOR_NAMES[stm], "in_check": board.is_check(),
-        "terminal": ev.terminal, "depth": ev.depth, "cached": getattr(st.pool.cache, "hits", 0) > hits_before,
+        "terminal": ev.terminal, "depth": ev.depth, "cached": getattr(st.cache, "hits", 0) > hits_before,
         "eval": {"cp_white": ev.cp_white, "mate": ev.best.mate if ev.best else None, "win_white": round(ev.win_white(), 4)},
         "lines": [{"rank": l.rank, "san": l.move_san, "uci": l.move_uci, "cp_white": l.cp, "mate": l.mate,
                    "win_side_to_move": round(l.pov_win(stm), 4), "win_white": round(l.pov_win(chess.WHITE), 4),

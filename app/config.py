@@ -18,7 +18,7 @@ def local_server_up(base_url: str, timeout: float = 0.6) -> bool:
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore", populate_by_name=True)
 
     # engine
     stockfish_path: Optional[str] = None
@@ -47,8 +47,15 @@ class Settings(BaseSettings):
 
     cors_origins: str = "*"
 
+    # hosted / serverless mode (Vercel): stateless, no database, engines spawned per request, offline coach only
+    hosted: bool = False                # env CHESSY_HOSTED is mapped below
+    access_code: Optional[str] = None   # if set, /api/* (except health) requires header X-Access-Code
+    hosted_pool_size: int = 2
+    hosted_max_depth: int = 14
+    hosted_max_plies: int = 200
+
     def resolved_stockfish(self) -> str:
-        path = self.stockfish_path or os.environ.get("STOCKFISH") or shutil.which("stockfish")
+        path = self.stockfish_path or os.environ.get("STOCKFISH") or shutil.which("stockfish") or _vendored_stockfish()
         if not path:
             raise FileNotFoundError(
                 "Stockfish not found. Run ./setup.sh, `brew install stockfish` / `sudo apt install stockfish`, "
@@ -62,6 +69,8 @@ class Settings(BaseSettings):
         return max(1, min(4, (os.cpu_count() or 2) // 2))
 
     def resolved_provider(self) -> str:
+        if self.hosted:
+            return "offline"            # no LLM and no local model server on serverless
         p = self.llm_provider.lower()
         if p != "auto":
             return p
@@ -74,6 +83,27 @@ class Settings(BaseSettings):
         return "offline"
 
 
+def _vendored_stockfish() -> Optional[str]:
+    """Linux x86-64 binary shipped in vendor/ (see scripts/fetch_stockfish_linux.sh). Serverless file systems are
+    read-only and may drop the exec bit, so it is copied to /tmp once per instance."""
+    import platform
+    import stat
+    src = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "vendor", "stockfish-linux-x86-64")
+    if not os.path.exists(src) or platform.system() != "Linux" or platform.machine() not in ("x86_64", "AMD64"):
+        return None
+    dst = "/tmp/stockfish-linux-x86-64"
+    if not os.path.exists(dst) or os.path.getsize(dst) != os.path.getsize(src):
+        shutil.copyfile(src, dst)
+        os.chmod(dst, os.stat(dst).st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+    return dst
+
+
 @lru_cache
 def get_settings() -> Settings:
-    return Settings()
+    s = Settings()
+    # Vercel always sets VERCEL=1, so hosted mode works whichever file the platform picks as the entry point
+    if os.environ.get("CHESSY_HOSTED", "").lower() in ("1", "true", "yes") or os.environ.get("VERCEL"):
+        s.hosted = True
+    if os.environ.get("CHESSY_ACCESS_CODE"):
+        s.access_code = os.environ["CHESSY_ACCESS_CODE"]
+    return s

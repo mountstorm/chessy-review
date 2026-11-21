@@ -19,6 +19,7 @@ if ! curl -s -m 2 localhost:11434/api/tags >/dev/null; then
   for _ in $(seq 1 20); do curl -s -m 1 localhost:11434/api/tags >/dev/null && break; sleep 1; done
 fi
 
+[ -x .venv/bin/pip ] && .venv/bin/pip install -q -r requirements-llm.txt || true
 say "Pulling $MODEL"
 ollama pull "$MODEL"
 

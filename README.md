@@ -11,7 +11,7 @@ Free, open-source chess game review: streaming Stockfish analysis, a what-if exp
 # open http://localhost:8765
 ```
 
-Manual route: Python 3.11+, `pip install -r requirements.txt`, `brew install stockfish` (or `sudo apt install stockfish`),
+Manual route: Python 3.11+, `pip install -r requirements.txt -r requirements-llm.txt` (the second file is only needed for the local/Anthropic/OpenAI coaches), `brew install stockfish` (or `sudo apt install stockfish`),
 `cp .env.example .env`. Without an API key the coach runs in **offline mode** (answers built purely from engine output).
 
 ### Coach options (none requires a paid API)
@@ -65,6 +65,21 @@ pieces) both present and created/missed by the move, critical-moment flags (`big
    dropped if malformed, so the model can never show raw markup or point at a non-square.
 4. If the LLM call fails, the request falls back to the offline coach.
 
+## Deploy to Vercel (hosted mode)
+
+Vercel has no warm processes, disk or GPU, so the hosted build is a **stateless** variant: it spawns a couple of
+Stockfish processes per request, keeps games in the browser tab (no database), and uses the offline coach. It switches on
+automatically when the `VERCEL` env var is present (or set `CHESSY_HOSTED=1`).
+
+```bash
+./scripts/fetch_stockfish_linux.sh     # downloads the Linux x86-64 Stockfish into vendor/ (98 MB, gitignored)
+npx vercel deploy --prod               # uploads the app + binary from disk
+```
+Hosted limits (env-tunable): `HOSTED_MAX_DEPTH=14`, `HOSTED_MAX_PLIES=200`, `HOSTED_POOL_SIZE=2`. Saved games, insights
+and the local AI coach are local-only. To restrict who can use a public deployment, set `CHESSY_ACCESS_CODE` in the
+Vercel project's environment variables; the UI then asks visitors for the code.
+Measured on Vercel: ~2 vCPU Xeon with AVX2, a 42-move game at depth 14 takes ~22 s, cold start ~5 s.
+
 ## Layout
 ```
 app/main.py            FastAPI app + lifespan (engine pool, DB, cache, coach)
@@ -73,7 +88,7 @@ app/coach/             agent loop, tools, prompts, provider adapters, offline co
 app/services/          PGN trees, Chess.com/Lichess importers, masters lookup, player analytics
 app/models/            Pydantic schemas + SQLAlchemy async models (SQLite)
 web/                   the UI (plain HTML/CSS/JS, served at /)
-tests/                 pytest suite (67 tests; engine tests skip if Stockfish is missing)
+tests/                 pytest suite (77 tests; engine tests skip if Stockfish is missing)
 ```
 
 ## Notes and limits

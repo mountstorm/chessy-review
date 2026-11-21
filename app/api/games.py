@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import logging
 from typing import Any, Dict, List
 
@@ -7,6 +8,7 @@ from fastapi import APIRouter, HTTPException, Request
 from sqlalchemy import delete, select
 
 from ..engine.review import review_game
+from ..engine.scope import engine_scope
 from ..models.db import Game, MoveRow, Review
 from ..models.schemas import AnalyzeRequest, GameSummary, ImportRequest
 from ..services import importers, masters, pgn as pgnlib
@@ -53,6 +55,18 @@ async def import_games(body: ImportRequest, request: Request) -> Dict[str, Any]:
     except pgnlib.PGNError as e:
         raise HTTPException(422, str(e))
     parsed = parsed[: (200 if source == "pgn" else body.max_games)]
+
+    if request.app.state.sessionmaker is None:          # hosted: nothing is stored, the browser keeps the games
+        out_h = []
+        for pg in parsed:
+            m = pg.meta
+            gid = "h" + hashlib.sha1((source + pg.source_id).encode()).hexdigest()[:10]
+            out_h.append({"id": gid, "source": source, "white": m["white"], "black": m["black"], "white_elo": m["white_elo"],
+                          "black_elo": m["black_elo"], "result": m["result"], "opening": m["opening"], "eco": m["eco"],
+                          "time_control": m["time_control"], "plies": len(pgnlib.mainline_nodes(pg.tree)),
+                          "variations": pgnlib.count_variations(pg.tree), "analyzed": False, "created": True,
+                          "meta": m, "pgn": pg.pgn, "tree": pg.tree, "reviews": []})
+        return {"games": out_h, "hosted": True}
 
     out: List[GameSummary] = []
     async with session(request) as s:
@@ -129,6 +143,8 @@ def _move_row(review_id: str, d: Dict[str, Any]) -> MoveRow:
 @router.post("/{game_id}/analyze")
 async def analyze(game_id: str, body: AnalyzeRequest, request: Request):
     st = state(request)
+    if st.sessionmaker is None:
+        return await _hosted_analyze(body, request)
     depth = min(body.depth, st.settings.max_depth)
     async with session(request) as s:
         g = await _get_game(s, game_id)
@@ -160,22 +176,56 @@ async def analyze(game_id: str, body: AnalyzeRequest, request: Request):
                 review = Review(game_id=game_id, depth=depth, multipv=body.multipv, complete=False)
                 s.add(review)
                 await s.commit()
-                async for ev in review_game(st.pool, start_fen, nodes, depth, body.multipv):
-                    t = ev["type"]
-                    if t == "start":
-                        yield sse("start", {**ev, "replay": False, "game": game_info, "depth": depth})
-                    elif t == "move":
-                        s.add(_move_row(review.id, ev["move"]))
-                        await s.commit()
-                        yield sse("move", ev)
-                    elif t == "summary":
-                        review.summary = ev["summary"]
-                        review.complete = True
-                        await s.commit()
-                        yield sse("summary", ev)
+                async with engine_scope(request.app) as pool:
+                    async for ev in review_game(pool, start_fen, nodes, depth, body.multipv):
+                        t = ev["type"]
+                        if t == "start":
+                            yield sse("start", {**ev, "replay": False, "game": game_info, "depth": depth})
+                        elif t == "move":
+                            s.add(_move_row(review.id, ev["move"]))
+                            await s.commit()
+                            yield sse("move", ev)
+                        elif t == "summary":
+                            review.summary = ev["summary"]
+                            review.complete = True
+                            await s.commit()
+                            yield sse("summary", ev)
                 yield sse("done", {"review_id": review.id, "cached": False})
         except Exception as e:   # surface to the client instead of silently dropping the stream
             log.exception("analysis failed")
+            yield sse("error", {"message": f"Analysis failed: {e}"})
+
+    return sse_response(gen())
+
+
+async def _hosted_analyze(body: AnalyzeRequest, request: Request):
+    """Stateless review for serverless hosting: the client sends the PGN, results stream back and nothing is stored."""
+    st = request.app.state
+    if not body.pgn:
+        raise HTTPException(422, "Send the game's PGN in `pgn` (hosted mode doesn't store games).")
+    try:
+        pg = pgnlib.parse_pgn(body.pgn)[0]
+    except pgnlib.PGNError as e:
+        raise HTTPException(422, str(e))
+    nodes = pgnlib.mainline_nodes(pg.tree)
+    if len(nodes) > st.settings.hosted_max_plies:
+        raise HTTPException(422, f"Hosted mode analyzes up to {st.settings.hosted_max_plies} plies per game "
+                                 f"(this one has {len(nodes)}). Run Chessy locally for longer games.")
+    depth = min(body.depth, st.settings.hosted_max_depth)
+    info = {"id": None, "white": pg.meta["white"], "black": pg.meta["black"], "opening": pg.meta["opening"], "result": pg.meta["result"]}
+
+    async def gen():
+        try:
+            async with engine_scope(request.app) as pool:
+                async for ev in review_game(pool, pg.tree["fen"], nodes, depth, body.multipv):
+                    t = ev["type"]
+                    if t == "start":
+                        yield sse("start", {**ev, "replay": False, "game": info, "depth": depth})
+                    else:
+                        yield sse(t, ev)
+            yield sse("done", {"cached": False})
+        except Exception as e:
+            log.exception("hosted analysis failed")
             yield sse("error", {"message": f"Analysis failed: {e}"})
 
     return sse_response(gen())

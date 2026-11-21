@@ -7,6 +7,8 @@ from fastapi import APIRouter, Request
 from sqlalchemy import select
 
 from ..coach.agent import run_coach
+from ..engine.scope import engine_scope
+from ..coach.tools import ToolExecutor
 from ..models.db import Game, MoveRow, Review
 from ..models.schemas import CoachRequest
 from .deps import session
@@ -17,7 +19,12 @@ router = APIRouter(prefix="/api/coach", tags=["coach"])
 
 
 async def _game_context(request: Request, req: CoachRequest) -> Optional[Dict[str, Any]]:
-    if not req.game_id:
+    if req.context:                                   # client-supplied (hosted mode has no database)
+        c = req.context
+        return {"white": c.white, "black": c.black, "opening": c.opening,
+                **({"last_move": {k: str(v)[:300] for k, v in c.last_move.items() if k in ("san", "label", "comment")}}
+                   if c.last_move and {"san", "label", "comment"} <= set(c.last_move) else {})}
+    if not req.game_id or request.app.state.sessionmaker is None:
         return None
     async with session(request) as s:
         g = await s.get(Game, req.game_id)
@@ -42,8 +49,9 @@ async def chat(body: CoachRequest, request: Request):
 
     async def gen():
         try:
-            async for ev in run_coach(body, st.executor, st.adapter, st.settings, ctx):
-                yield sse(ev["type"], ev)
+            async with engine_scope(request.app) as pool:
+                async for ev in run_coach(body, ToolExecutor(pool), st.adapter, st.settings, ctx):
+                    yield sse(ev["type"], ev)
         except Exception as e:
             log.exception("coach failed")
             yield sse("error", {"type": "error", "message": f"Coach error: {e}"})

@@ -24,6 +24,7 @@
       <h1>Understand every move.</h1>
       <p>Free game review with Stockfish, a what-if explorer, and a coach that checks the engine before it speaks.</p>
     </div>
+    <p class="muted small" id="hostedNote" hidden style="text-align:center;max-width:720px;margin:0 auto 14px"></p>
     <div class="import card">
       <div class="tabs" role="tablist" id="importTabs">
         <button class="tab active" data-src="pgn">Paste PGN / moves</button>
@@ -143,6 +144,13 @@
     <div id="insBox"></div>
   </section>
 </main>
+<div class="modal" id="codeModal" hidden>
+  <form class="card" id="codeForm">
+    <h2>Enter the access code</h2>
+    <p class="muted">This copy of Chessy is shared with friends only. Ask whoever sent you the link.</p>
+    <div class="row"><input id="codeInput" type="password" placeholder="Access code" autocomplete="off"><button class="btn primary">Continue</button></div>
+  </form>
+</div>
 <div class="toast" id="toast" role="status"></div>
 <script src="/assets/app.js"></script>
 </body>

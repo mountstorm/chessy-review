@@ -1,4 +1,4 @@
-from fastapi import Request
+from fastapi import HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -7,4 +7,8 @@ def state(request: Request):
 
 
 def session(request: Request) -> AsyncSession:
-    return request.app.state.sessionmaker()
+    sm = request.app.state.sessionmaker
+    if sm is None:
+        raise HTTPException(501, "Not available in hosted mode: games aren't stored on the server. "
+                                 "Run Chessy locally for saved games and insights.")
+    return sm()

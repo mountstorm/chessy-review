@@ -1,0 +1,12 @@
+.venv
+.git
+.github
+tests
+samples
+.env
+*.db
+__pycache__
+.pytest_cache
+node_modules
+.playwright-mcp
+*.png

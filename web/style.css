@@ -120,6 +120,7 @@ textarea{width:100%;min-height:150px;resize:vertical;font-family:ui-monospace,Me
 .res a{color:var(--accent)}
 .insgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
 .kv{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);font-size:14px}
+.modal{position:fixed;inset:0;background:rgba(10,12,20,.7);display:grid;place-items:center;z-index:60;padding:16px}.modal[hidden]{display:none}.modal .card{max-width:420px;width:100%;margin:0}
 .toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,30px);background:var(--panel2);border:1px solid var(--line);padding:10px 16px;border-radius:12px;opacity:0;pointer-events:none;transition:.25s;box-shadow:var(--shadow);z-index:50;max-width:90vw}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}

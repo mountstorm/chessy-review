@@ -41,6 +41,26 @@ class AnalyzeRequest(BaseModel):
     depth: int = Field(14, ge=6, le=30)
     multipv: int = Field(3, ge=1, le=5)
     force: bool = False
+    pgn: Optional[str] = Field(None, max_length=300_000, description="Hosted mode only: the game to analyze (nothing is stored server-side)")
+
+
+class MastersRequest(BaseModel):
+    sans: List[str] = Field(max_length=60)
+
+    @field_validator("sans")
+    @classmethod
+    def _sans(cls, v):
+        if not v or any(not s or len(s) > 12 for s in v):
+            raise ValueError("sans must be a non-empty list of SAN moves")
+        return v
+
+
+class GameContext(BaseModel):
+    """Client-supplied game info for the coach when the server has no database (hosted mode)."""
+    white: Optional[str] = Field(None, max_length=80)
+    black: Optional[str] = Field(None, max_length=80)
+    opening: Optional[str] = Field(None, max_length=120)
+    last_move: Optional[Dict[str, str]] = None
 
 
 class EvaluateRequest(BaseModel):
@@ -72,6 +92,7 @@ class CoachRequest(BaseModel):
     mode: Literal["explain", "socratic_hint", "quiz_me"] = "explain"
     history: List[ChatTurn] = Field(default_factory=list, max_length=40)
     player_rating: Optional[int] = Field(None, ge=100, le=3200)
+    context: Optional[GameContext] = None
 
     @field_validator("current_fen")
     @classmethod

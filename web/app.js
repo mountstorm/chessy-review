@@ -24,11 +24,16 @@ const S = {
   overlays: { best: true, threat: false, hang: true, heat: false },
   explore: null, sel: null, targets: [], legal: new Map(), posEval: new Map(),
   coachDraw: { arrows: [], hl: [] }, mode: 'explain', chat: [], tab: 'moves', mastersFor: null, busy: false,
+  hosted: false, hostedGames: {},
 };
 
 /* ---------- api ---------- */
+const getCode = () => { try { return localStorage.getItem('chessy.code') || ''; } catch { return ''; } };
+const authHeaders = () => ({ 'Content-Type': 'application/json', 'X-Access-Code': getCode() });
+function needCode() { $('#codeModal').hidden = false; setTimeout(() => $('#codeInput').focus(), 50); throw new Error('Access code required'); }
 async function api(path, opts = {}) {
-  const res = await fetch(path, { headers: { 'Content-Type': 'application/json' }, ...opts, body: opts.body ? JSON.stringify(opts.body) : undefined });
+  const res = await fetch(path, { ...opts, headers: authHeaders(), body: opts.body ? JSON.stringify(opts.body) : undefined });
+  if (res.status === 401) needCode();
   let data = null; try { data = await res.json(); } catch { /* empty */ }
   if (!res.ok) {
     const d = data && data.detail;
@@ -37,7 +42,8 @@ async function api(path, opts = {}) {
   return data;
 }
 async function streamSSE(path, body, handlers, signal) {
-  const res = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal });
+  const res = await fetch(path, { method: 'POST', headers: authHeaders(), body: JSON.stringify(body), signal });
+  if (res.status === 401) needCode();
   if (!res.ok) {
     let d = null; try { d = (await res.json()).detail; } catch { /* empty */ }
     throw new Error(typeof d === 'string' ? d : Array.isArray(d) ? d.map(x => x.msg).join('; ') : res.statusText);
@@ -365,7 +371,7 @@ function renderAll() {
 function mainline(tree) { const out = []; let n = tree; while (n.children && n.children.length) { n = n.children[0]; out.push(n); } return out; }
 async function openGame(id) {
   stopPlay(); if (S.abort) S.abort.abort();
-  const g = await api('/api/games/' + id);
+  const g = S.hosted ? S.hostedGames[id] : await api('/api/games/' + id);
   Object.assign(S, { game: g, nodes: mainline(g.tree), moves: [], evals: [], summary: null, ply: 0, explore: null, chat: [], mastersFor: null, analyzing: false, follow: false, coachDraw: { arrows: [], hl: [] } });
   S.fens = [g.tree.fen, ...S.nodes.map(n => n.fen)];
   S.flip = false; resetSel();
@@ -381,7 +387,7 @@ async function runAnalysis(depth, multipv = 3, force = false) {
   const btn = $('#analyzeBtn'), pr = $('#progress'), bar = $('#progressBar'), txt = $('#progressText');
   btn.disabled = true; pr.hidden = false; bar.style.width = '0'; txt.textContent = 'Starting engine…'; S.ply = 0; renderAll();
   try {
-    await streamSSE(`/api/games/${gid}/analyze`, { depth, multipv, force }, {
+    await streamSSE(`/api/games/${gid}/analyze`, { depth, multipv, force, ...(S.hosted ? { pgn: S.game.pgn } : {}) }, {
       start: d => { S.evals[0] = d.eval; txt.textContent = d.replay ? 'Loading saved review…' : `Analyzing ${d.total} moves at depth ${d.depth}…`; renderEval(); },
       move: d => {
         if (S.game.id !== gid) return;
@@ -411,7 +417,11 @@ async function coachSend(text) {
   addBubble('me', shown);
   const sans = [...S.nodes.slice(0, S.ply).map(n => n.san), ...(S.explore ? (S.explore.sans || []) : [])];
   const bubble = addBubble('bot cursor', ''), chips = {}; let full = '';
-  const body = { game_id: S.game ? S.game.id : null, current_fen: curFen(), move_history: sans, user_message: text, mode, history: S.chat.slice(-10) };
+  const body = { game_id: S.game && !S.hosted ? S.game.id : null, current_fen: curFen(), move_history: sans, user_message: text, mode, history: S.chat.slice(-10) };
+  if (S.hosted && S.game) {             // no server-side game storage: send the little context the coach needs
+    const lm = !S.explore && S.ply >= 1 ? mvAt(S.ply) : null;
+    body.context = { white: S.game.meta.white, black: S.game.meta.black, opening: S.game.meta.opening, ...(lm ? { last_move: { san: lm.san, label: lm.label, comment: lm.comment } } : {}) };
+  }
   try {
     await streamSSE('/api/coach/chat', body, {
       grounding: d => { $('#coachProvider').textContent = d.provider === 'offline' ? 'Offline engine coach' : `AI coach · ${d.provider}`; $('#coachProvider').classList.add('good'); },
@@ -439,7 +449,7 @@ async function loadMasters() {
   if (!S.game || S.mastersFor === S.game.id) return;
   const box = $('#mastersBox'); box.innerHTML = '<p class="muted">Searching master games (Lichess)…</p>';
   try {
-    const m = await api(`/api/games/${S.game.id}/masters`); S.mastersFor = S.game.id;
+    const m = await api('/api/masters', { method: 'POST', body: { sans: S.nodes.slice(0, 60).map(n => n.san) } }); S.mastersFor = S.game.id;
     let h = `<h3>Opening</h3><p><b>${esc(m.opening || 'Unknown')}</b> ${m.eco ? `<span class="pill">${esc(m.eco)}</span>` : ''}</p>`;
     if (m.error) h += `<p class="msg">${esc(m.error)}</p>`;
     h += `<p class="muted small">Your game followed master theory for ${m.plies_in_book} plies.` + (m.left_book_ply ? ` It left theory at move ${Math.ceil(m.left_book_ply / 2)} with <b>${esc(m.played)}</b>.` : '') + '</p>';
@@ -470,7 +480,7 @@ async function loadInsights(name) {
 
 /* ---------- home / library ---------- */
 async function loadLibrary() {
-  try { S.games = (await api('/api/games')).games; } catch { S.games = []; }
+  if (!S.hosted) { try { S.games = (await api('/api/games')).games; } catch (e) { if (e.message !== 'Access code required') S.games = []; } }
   $('#libraryCard').hidden = !S.games.length;
   $('#library').innerHTML = S.games.map(g => `<button class="gitem" data-id="${g.id}"><span><b>${esc(g.white)}</b> vs <b>${esc(g.black)}</b></span><span class="tag pill ${g.analyzed ? 'good' : ''}">${g.analyzed ? 'analyzed' : 'new'}</span><span class="meta">${g.plies} plies · ${esc(g.result)}${g.opening ? ' · ' + esc(g.opening) : ''} · ${esc(g.source)}</span></button>`).join('');
   $$('#library .gitem').forEach(b => b.onclick = () => openGame(b.dataset.id).catch(e => toast(e.message)));
@@ -479,6 +489,7 @@ async function doImport(body, btn) {
   const msg = $('#importMsg'); msg.className = 'msg'; msg.textContent = ''; btn.disabled = true;
   try {
     const r = await api('/api/games/import', { method: 'POST', body });
+    if (r.hosted) { r.games.forEach(g => { S.hostedGames[g.id] = g; }); const ids = new Set(r.games.map(g => g.id)); S.games = [...r.games, ...S.games.filter(g => !ids.has(g.id))]; }
     await loadLibrary();
     if (r.games.length === 1) await openGame(r.games[0].id);
     else { msg.className = 'msg ok'; msg.textContent = `Imported ${r.games.length} games. Pick one below.`; }
@@ -524,8 +535,17 @@ function init() {
     else if (e.key === 'Home') goTo(0); else if (e.key === 'End') goTo(1e6);
     else if (e.key === ' ') { togglePlay(); e.preventDefault(); } else if (e.key.toLowerCase() === 'f') { S.flip = !S.flip; renderAll(); }
   });
-  api('/api/health').then(h => { const s = $('#status'); s.classList.add('ok'); $('#statusText').textContent = `${h.engine} · ${h.workers} workers · coach: ${h.coach}`; })
-    .catch(() => { $('#status').classList.add('err'); $('#statusText').textContent = 'backend offline'; });
-  show('home');
+  $('#codeForm').onsubmit = e => { e.preventDefault(); try { localStorage.setItem('chessy.code', $('#codeInput').value.trim()); } catch { /* private mode */ } $('#codeModal').hidden = true; toast('Code saved. Try again.'); };
+  api('/api/health').then(h => {
+    const s = $('#status'); s.classList.add('ok'); $('#statusText').textContent = h.hosted ? `${h.engine} · hosted demo` : `${h.engine} · ${h.workers} workers · coach: ${h.coach}`;
+    if (h.hosted) {
+      S.hosted = true; $('[data-nav="insights"]').hidden = true; $('#hostedNote').hidden = false;
+      $('#hostedNote').textContent = `Hosted demo: games live in your browser tab and aren't saved. Analysis goes up to depth ${h.max_depth} and ${h.max_plies} moves. Run it locally for saved games, insights and a local AI coach.`;
+      const deep = $('#depthSel option[value="18"]'); if (deep) deep.remove();
+    }
+    if (h.needs_code && !getCode()) { $('#codeModal').hidden = false; }
+  })
+    .catch(() => { $('#status').classList.add('err'); $('#statusText').textContent = 'backend offline'; })
+    .finally(() => show('home'));      // after the health check, so hosted mode skips the database-backed library
 }
 init();
