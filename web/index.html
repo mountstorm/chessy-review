@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chessy: free game review</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%99%9E%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="#" data-nav="home"><span class="logo">♞</span> Chessy</a>
+  <nav>
+    <button class="navbtn" data-nav="review">Review</button>
+    <button class="navbtn" data-nav="insights">Insights</button>
+  </nav>
+  <div class="status" id="status" title="Backend status"><span class="dot"></span><span id="statusText">connecting…</span></div>
+</header>
+
+<main id="app">
+  <!-- HOME / IMPORT -->
+  <section id="view-home" class="view">
+    <div class="hero">
+      <h1>Understand every move.</h1>
+      <p>Free game review with Stockfish, a what-if explorer, and a coach that checks the engine before it speaks.</p>
+    </div>
+    <div class="import card">
+      <div class="tabs" role="tablist" id="importTabs">
+        <button class="tab active" data-src="pgn">Paste PGN / moves</button>
+        <button class="tab" data-src="chesscom">Chess.com</button>
+        <button class="tab" data-src="lichess">Lichess</button>
+      </div>
+      <div id="src-pgn" class="src">
+        <textarea id="pgnText" spellcheck="false" placeholder="Paste a PGN, or just moves like:  1. e4 e5 2. Nf3 Nc6 3. Bc4 …"></textarea>
+        <div class="row"><button class="btn primary" id="importPgn">Import game</button><button class="btn ghost" id="loadExample">Load example</button><label class="btn ghost file">Upload .pgn<input type="file" id="pgnFile" accept=".pgn,.txt" hidden></label></div>
+      </div>
+      <div id="src-chesscom" class="src" hidden>
+        <div class="row"><input id="ccUser" placeholder="Chess.com username" autocomplete="off"><select id="ccN"><option>3</option><option selected>5</option><option>10</option></select><button class="btn primary" id="importCc">Fetch recent games</button></div>
+      </div>
+      <div id="src-lichess" class="src" hidden>
+        <div class="row"><input id="liUser" placeholder="Lichess username" autocomplete="off"><select id="liN"><option>3</option><option selected>5</option><option>10</option></select><button class="btn primary" id="importLi">Fetch recent games</button></div>
+      </div>
+      <p class="msg" id="importMsg" role="alert"></p>
+    </div>
+    <div class="card" id="libraryCard" hidden>
+      <h2>Your games</h2>
+      <div id="library" class="library"></div>
+    </div>
+  </section>
+
+  <!-- REVIEW -->
+  <section id="view-review" class="view" hidden>
+    <div class="review">
+      <div class="left">
+        <div class="player top-player" id="pTop"></div>
+        <div class="boardwrap">
+          <div class="evalbar" id="evalbar" title="Evaluation"><div class="ebw" id="ebWhite"></div><span class="etop" id="ebTop"></span><span class="ebot" id="ebBot"></span></div>
+          <div class="board" id="boardHost"></div>
+        </div>
+        <div class="player bot-player" id="pBot"></div>
+        <div class="controls">
+          <button class="icon" id="bFirst" title="Start (Home)">⏮</button>
+          <button class="icon" id="bPrev" title="Back (←)">◀</button>
+          <button class="icon" id="bPlay" title="Autoplay (Space)">▶</button>
+          <button class="icon" id="bNext" title="Forward (→)">▶▶</button>
+          <button class="icon" id="bLast" title="End (End)">⏭</button>
+          <span class="sep"></span>
+          <button class="icon" id="bFlip" title="Flip (F)">⇅</button>
+        </div>
+        <div class="overlays" id="overlays">
+          <label><input type="checkbox" data-ov="best" checked> Best move</label>
+          <label><input type="checkbox" data-ov="threat"> Threat</label>
+          <label><input type="checkbox" data-ov="hang" checked> Hanging</label>
+          <label><input type="checkbox" data-ov="heat"> Control map</label>
+        </div>
+        <div class="chips" id="chips"></div>
+        <svg class="graph" id="graph" viewBox="0 0 600 90" preserveAspectRatio="none" aria-label="Evaluation graph"></svg>
+      </div>
+
+      <div class="right">
+        <div class="card runbar" id="runbar">
+          <div class="row">
+            <select id="depthSel" title="Analysis depth"><option value="10">Fast (depth 10)</option><option value="14" selected>Standard (depth 14)</option><option value="18">Deep (depth 18)</option></select>
+            <button class="btn primary" id="analyzeBtn">Analyze game</button>
+          </div>
+          <div class="progress" id="progress" hidden><div id="progressBar"></div></div>
+          <div class="small muted" id="progressText"></div>
+        </div>
+
+        <div class="tabs rtabs" id="rtabs">
+          <button class="tab active" data-rt="moves">Review</button>
+          <button class="tab" data-rt="lines">Lines</button>
+          <button class="tab" data-rt="coach">Coach</button>
+          <button class="tab" data-rt="masters">Masters</button>
+        </div>
+
+        <div class="panel" id="rt-moves">
+          <div class="card" id="moveCard"></div>
+          <div id="summaryBox"></div>
+          <div class="card"><h3>Moves</h3><div id="moveList" class="movelist"></div></div>
+        </div>
+
+        <div class="panel" id="rt-lines" hidden>
+          <div class="card">
+            <div id="exploreBar"></div>
+            <h3 id="linesTitle">Engine lines</h3>
+            <div id="lines" class="lines"></div>
+            <p class="small muted">Click a piece, then a square, to try your own moves (auto-queen). Click a line to play its first move.</p>
+          </div>
+        </div>
+
+        <div class="panel" id="rt-coach" hidden>
+          <div class="card coach">
+            <div class="row between">
+              <div class="seg" id="modeSeg">
+                <button class="active" data-mode="explain">Explain</button>
+                <button data-mode="socratic_hint">Hint me</button>
+                <button data-mode="quiz_me">Quiz me</button>
+              </div>
+              <span class="pill" id="coachProvider">coach</span>
+            </div>
+            <div id="chat" class="chat"><div class="bubble sys">Ask about any position. The coach checks Stockfish first, then points at the board.</div></div>
+            <form id="chatForm" class="row"><input id="chatInput" placeholder="Ask about this position…" autocomplete="off"><button class="btn primary" id="chatSend">Send</button></form>
+            <div class="row quick"><button class="btn ghost sm" data-q="Explain this position to me.">Explain this position</button><button class="btn ghost sm" data-q="What was wrong with the last move?">Last move?</button><button class="btn ghost sm" id="clearDraw">Clear drawings</button></div>
+          </div>
+        </div>
+
+        <div class="panel" id="rt-masters" hidden>
+          <div class="card" id="mastersBox"><p class="muted">Loading…</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INSIGHTS -->
+  <section id="view-insights" class="view" hidden>
+    <div class="card">
+      <h2>Your habits across games</h2>
+      <p class="muted">Pulls every analyzed game for a player: accuracy by phase, blunders under time pressure, the tactics you miss, your weakest openings.</p>
+      <form id="insForm" class="row"><input id="insUser" placeholder="Player name as it appears in the games" autocomplete="off"><button class="btn primary">Show insights</button></form>
+      <p class="msg" id="insMsg"></p>
+    </div>
+    <div id="insBox"></div>
+  </section>
+</main>
+<div class="toast" id="toast" role="status"></div>
+<script src="/assets/app.js"></script>
+</body>
+</html>
