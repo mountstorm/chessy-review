@@ -262,9 +262,17 @@ function renderMoveList() {
     const cell = k => { const n = S.nodes[k]; if (!n) return '<span></span>'; const m = S.moves[k], lab = m && BADGE_COLOR[m.label] && m.label !== 'best' ? `<span class="tag t-${m.label}">${LABELS[m.label][0]}</span>` : ''; return `<button class="mv ${!S.explore && S.ply === k + 1 ? 'cur' : ''}" data-ply="${k + 1}">${esc(n.san)}${lab}</button>`; };
     rows.push(`<span class="no">${i / 2 + 1}.</span>${cell(i)}${cell(i + 1)}`);
   }
+  const keep = el.scrollTop;
   el.innerHTML = `<div class="moves-grid">${rows.join('')}</div>`;
+  el.scrollTop = keep;
   $$('#moveList .mv').forEach(b => b.onclick = () => goTo(+b.dataset.ply));
-  const cur = $('#moveList .mv.cur'); if (cur) cur.scrollIntoView({ block: 'nearest' });
+  // scroll only the list itself; scrollIntoView would also scroll the page and push the board off screen
+  const cur = el.querySelector('.mv.cur');
+  if (cur) {
+    const c = el.getBoundingClientRect(), r = cur.getBoundingClientRect();
+    if (r.top < c.top) el.scrollTop += r.top - c.top;
+    else if (r.bottom > c.bottom) el.scrollTop += r.bottom - c.bottom;
+  }
 }
 
 /* ---------- lines tab (engine + explore) ---------- */
