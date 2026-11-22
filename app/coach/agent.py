@@ -80,6 +80,18 @@ def unverified_moves(text: str, board: chess.Board, facts: Dict[str, Any], histo
     return bad
 
 
+def _moves_in(obj: Any) -> List[str]:
+    """Every SAN move mentioned anywhere in a tool result (lines, PVs, refutations, legal-move lists). The model may
+    legitimately repeat these, even though they belong to positions other than the current one."""
+    if isinstance(obj, str):
+        return [m.group(0) for m in _SAN.finditer(obj)]
+    if isinstance(obj, dict):
+        return [m for v in obj.values() for m in _moves_in(v)]
+    if isinstance(obj, (list, tuple)):
+        return [m for v in obj for m in _moves_in(v)]
+    return []
+
+
 def _brief(result: Dict[str, Any]) -> str:
     if "error" in result:
         return result["error"]
@@ -178,6 +190,8 @@ async def run_coach(req: CoachRequest, executor: ToolExecutor, adapter: Optional
     state = adapter.new_state(system_prompt(req.mode, req.player_rating), messages)
     tags = TagStream()
     spoken: List[str] = []
+    from_tools: List[str] = []           # moves the model got from its own engine calls: these are verified too
+    refused = False
     try:
         for _ in range(settings.coach_max_tool_rounds):
             end: Optional[StepEnd] = None
@@ -192,6 +206,7 @@ async def run_coach(req: CoachRequest, executor: ToolExecutor, adapter: Optional
                 else:
                     end = ev
             if end is None or end.refused:
+                refused = True
                 yield {"type": "error", "message": "The coach declined to answer that request."}
                 break
             if not end.tool_calls:
@@ -201,6 +216,8 @@ async def run_coach(req: CoachRequest, executor: ToolExecutor, adapter: Optional
             results = await asyncio.gather(*(executor.run(c.name, c.input) for c in end.tool_calls))
             packed = [(c, r, err) for c, (r, err) in zip(end.tool_calls, results)]
             for c, r, err in packed:
+                if not err:
+                    from_tools.extend(_moves_in(r))
                 yield {"type": "tool_result", "name": c.name, "ok": not err, "summary": _brief(r)}
             adapter.add_tool_results(state, packed)
         else:
@@ -209,6 +226,18 @@ async def run_coach(req: CoachRequest, executor: ToolExecutor, adapter: Optional
         if tail:
             spoken.append(tail)
             yield {"type": "text", "delta": tail}
+        bad = [] if refused else unverified_moves("".join(spoken), board, facts, req.move_history, from_tools)
+        if bad:
+            # same guard as local mode: a move neither the engine nor the game gave is discarded, not shown
+            log.warning("cloud coach mentioned unverified moves %s; replaced with the engine's text", bad)
+            det = [e async for e in offline()]
+            yield {"type": "ui", "clear": True}        # arrows the model drew may point at the invented move
+            for e in det:
+                if e["type"] == "ui":
+                    yield e
+            yield {"type": "replace", "text": "".join(e["delta"] for e in det if e["type"] == "text")}
+            yield {"type": "notice", "message": f"The coach's wording was discarded (it mentioned {', '.join(bad[:4])}, "
+                                                "which the engine didn't give). Showing the engine's own explanation."}
     except LLMError as e:
         log.warning("LLM failed, falling back to offline coach: %s", e)
         yield {"type": "notice", "message": f"{e} Using the offline engine coach instead."}

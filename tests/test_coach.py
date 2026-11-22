@@ -308,3 +308,81 @@ async def test_local_server_down_falls_back_to_engine_text(pool):
     evs = await collect(run_coach(CoachRequest(current_fen=MATE_FEN, mode="explain"), ToolExecutor(pool), ad, get_settings()))
     assert any(e["type"] == "notice" and "ollama" in e["message"].lower() for e in evs)
     assert "Ra8#" in "".join(e.get("delta", "") for e in evs)
+
+
+# ---------------------------------------------------------------- hallucination guard on the cloud (tool-calling) path
+class _Cloud:
+    """Stand-in for the Anthropic/OpenAI adapter: optional tool call in round 1, then a fixed answer."""
+    provider = "anthropic"
+
+    def __init__(self, answer, tool_call=None, refused=False):
+        self.answer, self.tool_call, self.refused, self.rounds = answer, tool_call, refused, 0
+
+    def new_state(self, system, messages):
+        return {}
+
+    async def step(self, state):
+        self.rounds += 1
+        if self.tool_call and self.rounds == 1:
+            yield StepEnd([self.tool_call], "tool_use")
+            return
+        for c in self.answer:
+            yield TextDelta(c)
+        yield StepEnd([], "refusal" if self.refused else "end_turn", refused=self.refused)
+
+    def add_tool_results(self, state, results):
+        pass
+
+
+async def _cloud(pool, ad, mode="explain"):
+    req = CoachRequest(current_fen=MATE_FEN, mode=mode, user_message="what should I play?")
+    return await collect(run_coach(req, ToolExecutor(pool), ad, get_settings()))
+
+
+@needs_engine
+async def test_cloud_answer_with_invented_move_is_replaced_by_engine_text(pool):
+    evs = await _cloud(pool, _Cloud(["The knight takes ", "Nxe5 and wins."]))
+    rep = [e for e in evs if e["type"] == "replace"]
+    assert rep and "Ra8#" in rep[0]["text"] and "Nxe5" not in rep[0]["text"]
+    assert any(e["type"] == "notice" and "Nxe5" in e["message"] for e in evs)
+    assert evs[-1]["type"] == "done"
+
+
+@needs_engine
+async def test_cloud_replacement_clears_arrows_the_model_drew(pool):
+    evs = await _cloud(pool, _Cloud(["[[arrow:e4e5:red]]Nxe5 wins."]))
+    kinds = [e["type"] for e in evs]
+    model_ui = next(i for i, e in enumerate(evs) if e["type"] == "ui")           # drawn while streaming
+    clear = next(i for i, e in enumerate(evs) if e["type"] == "ui" and e.get("clear"))
+    assert model_ui < clear < kinds.index("replace")
+    assert any(e["type"] == "ui" and e.get("draw_arrows") for e in evs[clear:])   # the engine's own arrow follows
+
+
+@needs_engine
+async def test_cloud_may_repeat_moves_its_own_tool_calls_returned(pool):
+    start = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"           # Nf3 exists there, not in MATE_FEN
+    call = ToolCall("t1", "test_candidate_move", {"fen": start, "move": "Nf3", "depth": 9})
+    evs = await _cloud(pool, _Cloud(["On the starting position Nf3 is fine, but here Ra8# wins."], call))
+    kinds = [e["type"] for e in evs]
+    assert "replace" not in kinds and "notice" not in kinds and kinds[-1] == "done"
+
+
+@needs_engine
+async def test_cloud_answer_that_sticks_to_the_facts_is_untouched(pool):
+    evs = await _cloud(pool, _Cloud(["Ra8# is checkmate on the back rank."]))
+    kinds = [e["type"] for e in evs]
+    assert "replace" not in kinds and "notice" not in kinds
+    assert "".join(e["delta"] for e in evs if e["type"] == "text") == "Ra8# is checkmate on the back rank."
+
+
+@needs_engine
+async def test_cloud_guard_also_covers_hint_mode(pool):
+    evs = await _cloud(pool, _Cloud(["Try Qh7, it wins."]), mode="socratic_hint")
+    assert any(e["type"] == "replace" for e in evs) and any(e["type"] == "notice" and "Qh7" in e["message"] for e in evs)
+
+
+@needs_engine
+async def test_cloud_refusal_is_not_second_guessed(pool):
+    evs = await _cloud(pool, _Cloud(["Nxe5"], refused=True))
+    kinds = [e["type"] for e in evs]
+    assert "error" in kinds and "replace" not in kinds
