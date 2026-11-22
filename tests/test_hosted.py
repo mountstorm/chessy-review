@@ -119,3 +119,47 @@ def test_vercel_env_switches_on_hosted_mode(monkeypatch):
     finally:
         monkeypatch.undo()
         get_settings.cache_clear()
+
+
+# ---------------------------------------------------------------- /api/health reports the engine it really has
+FAKE_UCI = """#!/bin/sh
+echo run >> "$SPAWN_LOG"
+while read line; do
+  if [ "$line" = uci ]; then echo "id name Stockfish 99.9-test"; echo "id author nobody"; echo uciok; fi
+  if [ "$line" = quit ]; then exit 0; fi
+done
+"""
+
+
+@pytest.fixture
+def fresh_version_cache():
+    from app.engine import version
+    version._cache.clear()
+    yield
+    version._cache.clear()
+
+
+def test_health_reports_the_real_engine_version_and_spawns_it_once(monkeypatch, tmp_path, fresh_version_cache):
+    fake, log = tmp_path / "fake-stockfish", tmp_path / "spawns.log"
+    fake.write_text(FAKE_UCI)
+    fake.chmod(0o755)
+    monkeypatch.setenv("SPAWN_LOG", str(log))
+    with _client(monkeypatch, STOCKFISH_PATH=str(fake)) as c:
+        engines = {c.get("/api/health").json()["engine"] for _ in range(3)}
+    get_settings.cache_clear()
+    assert engines == {"Stockfish 99.9-test"}              # not the old hard-coded "Stockfish 19"
+    assert log.read_text().count("run") == 1                # read from the binary once, then cached
+
+
+def test_health_engine_is_null_when_the_binary_is_missing(monkeypatch, tmp_path, fresh_version_cache):
+    with _client(monkeypatch, STOCKFISH_PATH=str(tmp_path / "no-such-engine")) as c:
+        r = c.get("/api/health")
+    get_settings.cache_clear()
+    assert r.status_code == 200 and r.json()["status"] == "ok" and r.json()["engine"] is None
+
+
+@needs_engine
+def test_health_engine_matches_what_the_real_binary_reports(hosted, fresh_version_cache):
+    out = subprocess.run(["stockfish"], input="uci\nquit\n", capture_output=True, text=True, timeout=10).stdout
+    expected = next(l[len("id name "):].strip() for l in out.splitlines() if l.startswith("id name "))
+    assert hosted.get("/api/health").json()["engine"] == expected

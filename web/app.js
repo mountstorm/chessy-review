@@ -545,7 +545,7 @@ function init() {
   });
   $('#codeForm').onsubmit = e => { e.preventDefault(); try { localStorage.setItem('chessy.code', $('#codeInput').value.trim()); } catch { /* private mode */ } $('#codeModal').hidden = true; toast('Code saved. Try again.'); };
   api('/api/health').then(h => {
-    const s = $('#status'); s.classList.add('ok'); $('#statusText').textContent = h.hosted ? `${h.engine} · hosted demo` : `${h.engine} · ${h.workers} workers · coach: ${h.coach}`;
+    const s = $('#status'); s.classList.add('ok'); $('#statusText').textContent = h.hosted ? `${h.engine || 'Stockfish'} · hosted demo` : `${h.engine} · ${h.workers} workers · coach: ${h.coach}`;
     if (h.hosted) {
       S.hosted = true; $('[data-nav="insights"]').hidden = true; $('#hostedNote').hidden = false;
       $('#hostedNote').textContent = `Hosted demo: games live in your browser tab and aren't saved. Analysis goes up to depth ${h.max_depth} and ${h.max_plies} moves. Run it locally for saved games, insights and a local AI coach.`;

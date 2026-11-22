@@ -16,6 +16,7 @@ from .coach.tools import ToolExecutor
 from .config import get_settings
 from .engine.cache import make_cache
 from .engine.pool import EnginePool
+from .engine.version import engine_version
 from .models.db import make_sessionmaker
 
 log = logging.getLogger("chessy")
@@ -78,7 +79,11 @@ def create_app() -> FastAPI:
         st = request.app.state
         s = st.settings
         if s.hosted:
-            return {"status": "ok", "hosted": True, "engine": "Stockfish 19", "workers": s.hosted_pool_size, "coach": "offline",
+            try:
+                engine = await engine_version(s.resolved_stockfish())
+            except FileNotFoundError:
+                engine = None                     # no binary: say so rather than guess
+            return {"status": "ok", "hosted": True, "engine": engine, "workers": s.hosted_pool_size, "coach": "offline",
                     "needs_code": bool(s.access_code), "max_depth": s.hosted_max_depth, "max_plies": s.hosted_max_plies}
         return {"status": "ok", "hosted": False, "engine": st.pool.version, "workers": st.pool.size,
                 "coach": s.resolved_provider(), "needs_code": bool(s.access_code),
