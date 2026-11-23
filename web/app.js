@@ -24,7 +24,7 @@ const S = {
   overlays: { best: true, threat: false, hang: true, heat: false },
   explore: null, sel: null, targets: [], legal: new Map(), posEval: new Map(),
   coachDraw: { arrows: [], hl: [] }, mode: 'explain', chat: [], tab: 'moves', mastersFor: null, busy: false,
-  hosted: false, hostedGames: {},
+  hosted: false, hostedGames: {}, runSeq: 0,
 };
 
 /* ---------- api ---------- */
@@ -377,7 +377,7 @@ function renderAll() {
 
 /* ---------- game loading & analysis ---------- */
 function mainline(tree) { const out = []; let n = tree; while (n.children && n.children.length) { n = n.children[0]; out.push(n); } return out; }
-async function openGame(id) {
+async function openGame(id, auto = false) {
   stopPlay(); if (S.abort) S.abort.abort();
   const g = S.hosted ? S.hostedGames[id] : await api('/api/games/' + id);
   Object.assign(S, { game: g, nodes: mainline(g.tree), moves: [], evals: [], summary: null, ply: 0, explore: null, chat: [], mastersFor: null, analyzing: false, follow: false, coachDraw: { arrows: [], hl: [] } });
@@ -387,11 +387,22 @@ async function openGame(id) {
   show('review'); setTab('moves'); renderAll();
   const done = g.reviews.filter(r => r.complete).sort((a, b) => b.depth - a.depth)[0];
   if (done) { $('#depthSel').value = [10, 14, 18].includes(done.depth) ? done.depth : 14; runAnalysis(done.depth, done.multipv); }
+  else if (g.cache) restoreAnalysis(g);                       // hosted: finished in this tab already, don't spend the engine again
+  else if (auto) runAnalysis(+$('#depthSel').value);
   else { $('#analyzeBtn').textContent = 'Analyze game'; $('#progressText').textContent = ''; }
+}
+function restoreAnalysis(g) {
+  const c = g.cache;
+  S.moves = c.moves.slice(); S.evals = c.evals.slice(); S.summary = c.summary;
+  $('#depthSel').value = [10, 14, 18].includes(c.depth) ? c.depth : 14;
+  $('#analyzeBtn').textContent = 'Re-analyze'; $('#progressText').textContent = 'Analysis complete. Use ← → to step through.';
+  const first = S.moves.find(m => ERRORS.includes(m.label) && m.label !== 'inaccuracy');
+  S.ply = first ? Math.max(0, first.ply - 1) : S.fens.length - 1;
+  renderAll();
 }
 async function runAnalysis(depth, multipv = 3, force = false) {
   if (S.analyzing) return;
-  const gid = S.game.id; S.analyzing = true; S.follow = true; S.moves = []; S.evals = []; S.summary = null; S.abort = new AbortController();
+  const gid = S.game.id, run = ++S.runSeq; S.analyzing = true; S.follow = true; S.moves = []; S.evals = []; S.summary = null; S.abort = new AbortController();
   const btn = $('#analyzeBtn'), pr = $('#progress'), bar = $('#progressBar'), txt = $('#progressText');
   btn.disabled = true; pr.hidden = false; bar.style.width = '0'; txt.textContent = 'Starting engine…'; S.ply = 0; renderAll();
   try {
@@ -405,10 +416,14 @@ async function runAnalysis(depth, multipv = 3, force = false) {
         renderAll();
       },
       summary: d => { S.summary = d.summary; },
-      done: () => { txt.textContent = 'Analysis complete. Use ← → to step through.'; },
+      done: () => {
+        txt.textContent = 'Analysis complete. Use ← → to step through.';
+        if (S.hosted && S.game && S.game.id === gid) S.game.cache = { depth, multipv, moves: S.moves.slice(), evals: S.evals.slice(), summary: S.summary };
+      },
       error: d => { txt.textContent = ''; toast(d.message); },
     }, S.abort.signal);
-  } catch (e) { txt.textContent = ''; if (e.name !== 'AbortError') toast(e.message); }
+  } catch (e) { if (run === S.runSeq) txt.textContent = ''; if (e.name !== 'AbortError') toast(e.message); }
+  if (run !== S.runSeq) return;       // another game was opened meanwhile: that run owns the UI now
   S.analyzing = false; S.follow = false; btn.disabled = false; btn.textContent = 'Re-analyze'; pr.hidden = true;
   if (S.game && S.game.id === gid) {
     const first = S.moves.find(m => ERRORS.includes(m.label) && m.label !== 'inaccuracy');
@@ -491,7 +506,7 @@ async function loadLibrary() {
   if (!S.hosted) { try { S.games = (await api('/api/games')).games; } catch (e) { if (e.message !== 'Access code required') S.games = []; } }
   $('#libraryCard').hidden = !S.games.length;
   $('#library').innerHTML = S.games.map(g => `<button class="gitem" data-id="${g.id}"><span><b>${esc(g.white)}</b> vs <b>${esc(g.black)}</b></span><span class="tag pill ${g.analyzed ? 'good' : ''}">${g.analyzed ? 'analyzed' : 'new'}</span><span class="meta">${g.plies} plies · ${esc(g.result)}${g.opening ? ' · ' + esc(g.opening) : ''} · ${esc(g.source)}</span></button>`).join('');
-  $$('#library .gitem').forEach(b => b.onclick = () => openGame(b.dataset.id).catch(e => toast(e.message)));
+  $$('#library .gitem').forEach(b => b.onclick = () => openGame(b.dataset.id, true).catch(e => toast(e.message)));
 }
 async function doImport(body, btn) {
   const msg = $('#importMsg'); msg.className = 'msg'; msg.textContent = ''; btn.disabled = true;
@@ -499,7 +514,7 @@ async function doImport(body, btn) {
     const r = await api('/api/games/import', { method: 'POST', body });
     if (r.hosted) { r.games.forEach(g => { S.hostedGames[g.id] = g; }); const ids = new Set(r.games.map(g => g.id)); S.games = [...r.games, ...S.games.filter(g => !ids.has(g.id))]; }
     await loadLibrary();
-    if (r.games.length === 1) await openGame(r.games[0].id);
+    if (r.games.length === 1) await openGame(r.games[0].id, true);
     else { msg.className = 'msg ok'; msg.textContent = `Imported ${r.games.length} games. Pick one below.`; }
   } catch (e) { msg.textContent = e.message; }
   btn.disabled = false;
@@ -521,7 +536,7 @@ function init() {
   $$('[data-nav]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); const v = b.dataset.nav; if (v === 'review' && !S.game) return toast('Import a game first.'); show(v); }));
   $$('#importTabs .tab').forEach(b => b.onclick = () => { $$('#importTabs .tab').forEach(x => x.classList.toggle('active', x === b)); ['pgn', 'chesscom', 'lichess'].forEach(k => $('#src-' + k).hidden = k !== b.dataset.src); });
   $('#importPgn').onclick = e => { const t = $('#pgnText').value.trim(); if (!t) return toast('Paste a PGN or some moves first.'); doImport({ pgn: t }, e.target); };
-  $('#loadExample').onclick = () => { $('#pgnText').value = EXAMPLE; };
+  $('#loadExample').onclick = e => { $('#pgnText').value = EXAMPLE; doImport({ pgn: EXAMPLE }, e.target); };      // load, import and analyze in one click
   $('#pgnFile').onchange = async e => { const f = e.target.files[0]; if (f) $('#pgnText').value = await f.text(); };
   $('#importCc').onclick = e => { const u = $('#ccUser').value.trim(); if (!u) return toast('Enter a username.'); doImport({ chesscom_username: u, max_games: +$('#ccN').value }, e.target); };
   $('#importLi').onclick = e => { const u = $('#liUser').value.trim(); if (!u) return toast('Enter a username.'); doImport({ lichess_username: u, max_games: +$('#liN').value }, e.target); };
