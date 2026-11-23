@@ -408,7 +408,7 @@ async function runAnalysis(depth, multipv = 3, force = false) {
       done: () => { txt.textContent = 'Analysis complete. Use ← → to step through.'; },
       error: d => { txt.textContent = ''; toast(d.message); },
     }, S.abort.signal);
-  } catch (e) { if (e.name !== 'AbortError') toast(e.message); }
+  } catch (e) { txt.textContent = ''; if (e.name !== 'AbortError') toast(e.message); }
   S.analyzing = false; S.follow = false; btn.disabled = false; btn.textContent = 'Re-analyze'; pr.hidden = true;
   if (S.game && S.game.id === gid) {
     const first = S.moves.find(m => ERRORS.includes(m.label) && m.label !== 'inaccuracy');

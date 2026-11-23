@@ -75,7 +75,13 @@ automatically when the `VERCEL` env var is present (or set `CHESSY_HOSTED=1`).
 ./scripts/fetch_stockfish_linux.sh     # downloads the Linux x86-64 Stockfish into vendor/ (98 MB, gitignored)
 npx vercel deploy --prod               # uploads the app + binary from disk
 ```
-Hosted limits (env-tunable): `HOSTED_MAX_DEPTH=14`, `HOSTED_MAX_PLIES=200`, `HOSTED_POOL_SIZE=2`. Saved games, insights
+Hosted limits (env-tunable): `HOSTED_MAX_DEPTH=14`, `HOSTED_MAX_PLIES=200`, `HOSTED_POOL_SIZE=2`.
+Rate limits per visitor IP (HTTP 429 with a clear message and `Retry-After`; `0` disables a limit):
+`HOSTED_RATE_ANALYZE=10`, `HOSTED_RATE_EVALUATE=120`, `HOSTED_RATE_COACH=30` requests per `HOSTED_RATE_WINDOW=3600` seconds.
+Visitors who send a valid access code are exempt. The counters live in memory, so on a serverless platform they are
+per instance and best-effort: a visitor spread across instances (or a cold start) can get a few extra requests. The
+client address is the last `X-Forwarded-For` entry, which Vercel sets; behind a proxy that doesn't, every visitor
+would share one bucket. Saved games, insights
 and the local AI coach are local-only. To restrict who can use a public deployment, set `CHESSY_ACCESS_CODE` in the
 Vercel project's environment variables; the UI then asks visitors for the code.
 Measured on Vercel: ~2 vCPU Xeon with AVX2, a 42-move game at depth 14 takes ~22 s, cold start ~5 s.

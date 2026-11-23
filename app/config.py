@@ -53,6 +53,11 @@ class Settings(BaseSettings):
     hosted_pool_size: int = 2
     hosted_max_depth: int = 14
     hosted_max_plies: int = 200
+    # per-IP rate limits in hosted mode, requests per window (0 = unlimited); env HOSTED_RATE_ANALYZE etc.
+    hosted_rate_analyze: int = 10
+    hosted_rate_evaluate: int = 120
+    hosted_rate_coach: int = 30
+    hosted_rate_window: int = 3600      # seconds
 
     def resolved_stockfish(self) -> str:
         path = self.stockfish_path or os.environ.get("STOCKFISH") or shutil.which("stockfish") or _vendored_stockfish()

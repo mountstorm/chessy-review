@@ -18,6 +18,7 @@ from .engine.cache import make_cache
 from .engine.pool import EnginePool
 from .engine.version import engine_version
 from .models.db import make_sessionmaker
+from .ratelimit import RateLimiter
 
 log = logging.getLogger("chessy")
 WEB = Path(__file__).resolve().parent.parent / "web"
@@ -51,6 +52,7 @@ def _hosted_state(app: FastAPI) -> None:
     app.state.sessionmaker = None
     app.state.executor = None
     app.state.adapter = None
+    app.state.limiter = RateLimiter()
 
 
 def create_app() -> FastAPI:

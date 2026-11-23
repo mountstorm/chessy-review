@@ -4,13 +4,14 @@ import hashlib
 import logging
 from typing import Any, Dict, List
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import delete, select
 
 from ..engine.review import review_game
 from ..engine.scope import engine_scope
 from ..models.db import Game, MoveRow, Review
 from ..models.schemas import AnalyzeRequest, GameSummary, ImportRequest
+from ..ratelimit import rate_limit
 from ..services import importers, masters, pgn as pgnlib
 from .deps import session, state
 from .sse import sse, sse_response
@@ -140,7 +141,7 @@ def _move_row(review_id: str, d: Dict[str, Any]) -> MoveRow:
                    missed_motifs=d.get("missed_motifs", []), data=d)
 
 
-@router.post("/{game_id}/analyze")
+@router.post("/{game_id}/analyze", dependencies=[Depends(rate_limit("analyze"))])
 async def analyze(game_id: str, body: AnalyzeRequest, request: Request):
     st = state(request)
     if st.sessionmaker is None:

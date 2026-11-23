@@ -3,18 +3,19 @@ from __future__ import annotations
 from typing import Any, Dict
 
 import chess
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from ..coach.tools import parse_move
 from ..engine import motifs as mt
 from ..engine.scope import engine_scope
 from ..engine.visuals import arrow, position_visuals
 from ..models.schemas import EvaluateRequest
+from ..ratelimit import rate_limit
 
 router = APIRouter(prefix="/api/positions", tags=["positions"])
 
 
-@router.post("/evaluate")
+@router.post("/evaluate", dependencies=[Depends(rate_limit("evaluate"))])
 async def evaluate(body: EvaluateRequest, request: Request) -> Dict[str, Any]:
     """Branch explorer: any FEN plus an optional move sequence -> MultiPV lines, win %, motifs, overlay data.
     Repeated lookups are served from the (FEN, depth, multipv) cache."""

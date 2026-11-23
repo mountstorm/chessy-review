@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, Optional
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy import select
 
 from ..coach.agent import run_coach
@@ -11,6 +11,7 @@ from ..engine.scope import engine_scope
 from ..coach.tools import ToolExecutor
 from ..models.db import Game, MoveRow, Review
 from ..models.schemas import CoachRequest
+from ..ratelimit import rate_limit
 from .deps import session
 from .sse import sse, sse_response
 
@@ -42,7 +43,7 @@ async def _game_context(request: Request, req: CoachRequest) -> Optional[Dict[st
         return ctx
 
 
-@router.post("/chat")
+@router.post("/chat", dependencies=[Depends(rate_limit("coach"))])
 async def chat(body: CoachRequest, request: Request):
     st = request.app.state
     ctx = await _game_context(request, body)
