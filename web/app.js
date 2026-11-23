@@ -205,7 +205,7 @@ function renderBoard() {
 function renderEval() {
   const e = evalAt(S.ply), win = e ? e.win : .5;
   const h = S.flip ? (1 - win) * 100 : win * 100;
-  $('#ebWhite').style.height = h + '%';
+  $('#ebWhite').style.setProperty('--p', h + '%');          // height of the vertical bar; width of the horizontal one on phones
   $('#evalbar').style.background = S.flip ? '#f1f1f1' : '#262626'; $('#ebWhite').style.background = S.flip ? '#262626' : '#f1f1f1';
   const txt = fmtEval(e), whiteAhead = e ? e.cp >= 0 : true;
   const top = $('#ebTop'), bot = $('#ebBot'); top.textContent = bot.textContent = '';

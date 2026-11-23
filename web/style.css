@@ -21,7 +21,7 @@ nav{display:flex;gap:4px;flex:1}
 .navbtn:hover,.navbtn.active{background:var(--panel2);color:var(--text)}
 .status{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
 .dot{width:9px;height:9px;border-radius:50%;background:var(--warn)} .status.ok .dot{background:var(--good)} .status.err .dot{background:var(--bad)}
-main{max-width:1280px;margin:0 auto;padding:22px max(16px,3vw) 60px}
+main{--pad:max(16px,3vw);max-width:1280px;margin:0 auto;padding:22px var(--pad) 60px}
 .view[hidden]{display:none}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
 .hero{text-align:center;padding:30px 0 22px} .hero p{color:var(--muted);max-width:560px;margin:8px auto 0;font-size:17px}
@@ -64,7 +64,7 @@ textarea{width:100%;min-height:150px;resize:vertical;font-family:ui-monospace,Me
 .player .acc{font-size:12px;font-weight:600;color:var(--muted);margin-left:8px}
 .boardwrap{display:flex;gap:8px}
 .evalbar{position:relative;width:30px;border-radius:8px;overflow:hidden;background:#262626;flex:none;border:1px solid var(--line)}
-.ebw{position:absolute;left:0;right:0;bottom:0;background:#f1f1f1;height:50%;transition:height .45s cubic-bezier(.2,.8,.2,1)}
+.ebw{position:absolute;left:0;right:0;bottom:0;background:#f1f1f1;height:var(--p,50%);transition:height .45s cubic-bezier(.2,.8,.2,1),width .45s cubic-bezier(.2,.8,.2,1)}
 .etop,.ebot{position:absolute;left:0;right:0;text-align:center;font-size:10px;font-weight:700;padding:3px 0}
 .etop{top:0;color:#ddd} .ebot{bottom:0;color:#222}
 .board{flex:1;aspect-ratio:1;border-radius:8px;overflow:hidden;box-shadow:var(--shadow);user-select:none;touch-action:manipulation}
@@ -79,6 +79,18 @@ textarea{width:100%;min-height:150px;resize:vertical;font-family:ui-monospace,Me
 .chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:10px 0 0 38px}
 .chips .pill b{color:var(--text)}
 .graph{width:calc(100% - 38px);margin:12px 0 0 38px;height:90px;background:var(--panel);border:1px solid var(--line);border-radius:10px;cursor:pointer;display:block}
+/* Phones: the board takes the whole screen width. The evaluation bar moves from beside the board to a thin strip above it, and the
+   38px indent that lined everything up beside the vertical bar goes away. */
+@media (max-width:520px){
+  .boardwrap{flex-direction:column;gap:0;margin:0 calc(var(--pad) * -1)}
+  .evalbar{width:auto;height:16px;border-radius:0;border-width:1px 0}
+  .ebw{top:0;right:auto;width:var(--p,50%);height:100%}
+  .etop,.ebot{top:0;bottom:0;display:flex;align-items:center;padding:0 8px}
+  .etop{left:auto;right:0} .ebot{right:auto;left:0}
+  .board{flex:none;width:100%;border-radius:0;box-shadow:none}
+  .player{padding-left:4px} .controls{padding-left:0} .overlays{padding-left:0} .chips{margin-left:0}
+  .graph{width:100%;margin-left:0}
+}
 
 /* review panels */
 .panel[hidden]{display:none}
