@@ -72,6 +72,8 @@ textarea{width:100%;min-height:150px;resize:vertical;font-family:ui-monospace,Me
 .controls{display:flex;gap:6px;justify-content:center;margin:12px 0 8px;padding-left:38px}
 .icon{background:var(--panel2);border:1px solid var(--line);border-radius:10px;min-width:44px;height:40px;cursor:pointer;font-size:15px}
 .icon:hover{border-color:var(--accent)} .sep{width:14px}
+.icon.step{font-size:28px;line-height:1;padding:0 0 4px}      /* ‹ › are small glyphs: size them up to match the other icons */
+.icon:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .overlays{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;font-size:13px;color:var(--muted);padding-left:38px}
 .overlays label{display:flex;gap:5px;align-items:center;cursor:pointer}
 .chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:10px 0 0 38px}

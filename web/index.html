@@ -64,13 +64,13 @@
         </div>
         <div class="player bot-player" id="pBot"></div>
         <div class="controls">
-          <button class="icon" id="bFirst" title="Start (Home)">⏮</button>
-          <button class="icon" id="bPrev" title="Back (←)">◀</button>
-          <button class="icon" id="bPlay" title="Autoplay (Space)">▶</button>
-          <button class="icon" id="bNext" title="Forward (→)">▶▶</button>
-          <button class="icon" id="bLast" title="End (End)">⏭</button>
+          <button class="icon" id="bFirst" title="Start (Home)" aria-label="Go to start" aria-keyshortcuts="Home">⏮</button>
+          <button class="icon step" id="bPrev" title="Previous move (←)" aria-label="Previous move" aria-keyshortcuts="ArrowLeft">‹</button>
+          <button class="icon" id="bPlay" title="Autoplay (Space)" aria-label="Play" aria-keyshortcuts="Space">▶</button>
+          <button class="icon step" id="bNext" title="Next move (→)" aria-label="Next move" aria-keyshortcuts="ArrowRight">›</button>
+          <button class="icon" id="bLast" title="End (End)" aria-label="Go to end" aria-keyshortcuts="End">⏭</button>
           <span class="sep"></span>
-          <button class="icon" id="bFlip" title="Flip (F)">⇅</button>
+          <button class="icon" id="bFlip" title="Flip board (F)" aria-label="Flip board" aria-keyshortcuts="F">⇅</button>
         </div>
         <div class="overlays" id="overlays">
           <label><input type="checkbox" data-ov="best" checked> Best move</label>

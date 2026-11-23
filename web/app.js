@@ -381,11 +381,17 @@ function goTo(p, manual = true) {
   if (manual) { S.follow = p === S.fens.length - 1 && S.analyzing; stopPlay(); }
   S.ply = p; S.explore = null; S.coachDraw = { arrows: [], hl: [] }; resetSel(); renderAll();
 }
-function stopPlay() { if (S.playing) { clearInterval(S.playing); S.playing = null; $('#bPlay').textContent = '▶'; } }
+// ▶ means autoplay and nothing else (stepping uses ‹ ›); while it runs the same button becomes pause, and its name follows
+function setPlayButton(playing) {
+  const b = $('#bPlay');
+  b.textContent = playing ? '⏸' : '▶';
+  b.setAttribute('aria-label', playing ? 'Pause' : 'Play'); b.title = playing ? 'Pause (Space)' : 'Autoplay (Space)';
+}
+function stopPlay() { if (S.playing) { clearInterval(S.playing); S.playing = null; setPlayButton(false); } }
 function togglePlay() {
   if (S.playing) return stopPlay();
   if (S.ply >= S.fens.length - 1) S.ply = 0;
-  $('#bPlay').textContent = '⏸';
+  setPlayButton(true);
   S.playing = setInterval(() => { if (S.ply >= S.fens.length - 1) return stopPlay(); goTo(S.ply + 1, false); }, 900);
 }
 function renderAll() {
