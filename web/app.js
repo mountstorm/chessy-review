@@ -547,7 +547,7 @@ async function doImport(body, btn) {
   const label = btn.textContent; if (btn.dataset.busy) btn.textContent = btn.dataset.busy;
   try {
     const r = await api('/api/games/import', { method: 'POST', body });
-    if (r.hosted) { r.games.forEach(g => { S.hostedGames[g.id] = g; }); const ids = new Set(r.games.map(g => g.id)); S.games = [...r.games, ...S.games.filter(g => !ids.has(g.id))]; }
+    if (r.hosted) { S.hosted = true; r.games.forEach(g => { S.hostedGames[g.id] = g; }); const ids = new Set(r.games.map(g => g.id)); S.games = [...r.games, ...S.games.filter(g => !ids.has(g.id))]; }
     await loadLibrary();
     if (r.games.length === 1) await openGame(r.games[0].id, true);
     else { msg.className = 'msg ok'; msg.textContent = `Imported ${r.games.length} games. Pick one below.`; }
