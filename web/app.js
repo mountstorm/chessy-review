@@ -267,7 +267,11 @@ function renderSummary() {
 function renderMoveList() {
   const el = $('#moveList'), rows = [];
   for (let i = 0; i < S.nodes.length; i += 2) {
-    const cell = k => { const n = S.nodes[k]; if (!n) return '<span></span>'; const m = S.moves[k], lab = m && BADGE_COLOR[m.label] && m.label !== 'best' ? `<span class="tag t-${m.label}" role="img" title="${LABELS[m.label][1]}" aria-label="${LABELS[m.label][1]}">${LABELS[m.label][0]}</span>` : ''; return `<button class="mv ${!S.explore && S.ply === k + 1 ? 'cur' : ''}" data-ply="${k + 1}">${esc(n.san)}${lab}</button>`; };
+    const cell = k => {
+      const n = S.nodes[k]; if (!n) return '<span></span>';
+      const m = S.moves[k], flagged = m && BADGE_COLOR[m.label] && m.label !== 'best';      // best/good/excellent stay plain: most moves are Best
+      return `<button class="mv${flagged ? ' tint c-' + m.label : ''}${!S.explore && S.ply === k + 1 ? ' cur' : ''}" data-ply="${k + 1}">${esc(n.san)}${flagged ? badge(m.label) : ''}</button>`;
+    };
     rows.push(`<span class="no">${i / 2 + 1}.</span>${cell(i)}${cell(i + 1)}`);
   }
   const keep = el.scrollTop;

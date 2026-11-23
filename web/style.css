@@ -99,14 +99,15 @@ textarea{width:100%;min-height:150px;resize:vertical;font-family:ui-monospace,Me
 .prow{display:grid;grid-template-columns:minmax(64px,28%) 1fr 40px;gap:8px;align-items:center;margin-top:3px}
 .prow .bar{margin-top:0}.pn{display:flex;gap:6px;align-items:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pv{text-align:right;font-variant-numeric:tabular-nums}
 .sw{flex:none;width:10px;height:10px;border-radius:3px;border:1px solid var(--muted)}.sw.white{background:#fff}.sw.black{background:#1b2030}
-.movelist{max-height:45vh;overflow-y:auto;overscroll-behavior:contain;position:relative}
+.movelist{max-height:45vh;overflow-y:auto;overscroll-behavior:contain;position:relative;padding-right:8px}
 .moves-grid{display:grid;grid-template-columns:36px 1fr 1fr;gap:2px 6px;align-items:center}
 .moves-grid .no{color:var(--muted);font-size:12px;text-align:right}
-.mv{background:none;border:0;border-radius:8px;padding:5px 8px;text-align:left;cursor:pointer;display:flex;gap:6px;align-items:center;justify-content:space-between;font-weight:600}
+.mv{background:none;border:0;border-radius:8px;padding:5px 8px;text-align:left;cursor:pointer;display:flex;gap:7px;align-items:center;justify-content:flex-start;font-weight:600}
 .mv:hover{background:var(--panel2)} .mv.cur{background:var(--accent);color:var(--accent-ink)}
-.mv .tag{font-size:11px;font-weight:800;opacity:.95}
-.t-brilliant{color:var(--brilliant)}.t-great{color:var(--great)}.t-mistake{color:#ee8a3c}.t-blunder{color:var(--bad)}.t-inaccuracy{color:var(--warn)}.t-missed_win{color:#c04bd6}
-.mv.cur .tag{color:var(--accent-ink)}
+/* classified moves: the symbol sits right after the move and the cell is tinted in the classification colour (text stays readable) */
+.mv.c-brilliant{--c:var(--brilliant)} .mv.c-great{--c:var(--great)} .mv.c-inaccuracy{--c:var(--warn)} .mv.c-mistake{--c:#ee8a3c} .mv.c-blunder{--c:var(--bad)} .mv.c-missed_win{--c:#c04bd6}
+.mv.tint{background:color-mix(in srgb,var(--c) 18%,transparent)} .mv.tint:hover{background:color-mix(in srgb,var(--c) 30%,transparent)}
+.mv.tint.cur{background:var(--accent)} .mv.cur .badge{box-shadow:0 0 0 2px #fff}
 .lines{display:grid;gap:6px}
 .line{display:grid;grid-template-columns:62px 1fr;gap:10px;align-items:center;padding:7px 9px;border-radius:10px;background:var(--panel2);cursor:pointer;border:1px solid transparent;text-align:left}
 .line:hover{border-color:var(--accent)} .line .ev{font-weight:800;font-variant-numeric:tabular-nums;text-align:center;border-radius:6px;padding:3px 0;font-size:13px}
