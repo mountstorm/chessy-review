@@ -19,6 +19,45 @@ LABEL_TEXT = {"brilliant": "a brilliant move", "great": "a great move", "best": 
               "missed_win": "a missed win"}
 
 
+# What the better move would have set up, in words (the review records motif types for moves it says were missed).
+# The order is the order of importance: when there are more than two ideas, the first two are the ones mentioned.
+MOTIF_PHRASE = {"mate": "a forced mate", "fork": "a fork", "pin": "a pin", "skewer": "a skewer",
+                "discovered_attack": "a discovered attack", "hanging": "a loose piece to win"}
+MOMENT_MIN_LOSS = 0.15      # a "turning point" costs at least this much win probability
+MOMENT_LIMIT = 3
+
+
+def moment_sentence(move: Dict[str, Any]) -> str:
+    """One third-person sentence about a costly move, from the engine's review data only. Third person on purpose: the same
+    line is shown for either player, so it can't say "you"."""
+    side = move["mover"].capitalize()
+    cost = f"{side}'s {move['san']} " + ("let a win slip away, costing" if move["label"] == "missed_win" else "cost") + \
+        f" {round(move['loss'] * 100)}% win chance"
+    best = (move.get("best") or {}).get("san")
+    if not best:
+        return cost + "."
+    tail = f"{best} was the better move"
+    ideas = [MOTIF_PHRASE[t] for t in MOTIF_PHRASE if t in (move.get("missed_motifs") or [])][:2]          # importance order, not input order
+    if ideas:
+        tail += ", setting up " + " and ".join(ideas)
+    return f"{cost}; {tail}."
+
+
+def build_moments(moves: List[Dict[str, Any]], key_moments: List[int]) -> List[Dict[str, Any]]:
+    """The turning points of a game: from the review's key moments (its biggest losses), keep the ones that really cost
+    something, at most MOMENT_LIMIT, and put them in game order so they read as the story of the game."""
+    by_ply = {m["ply"]: m for m in moves}
+    picked = [by_ply[p] for p in key_moments if p in by_ply and by_ply[p]["loss"] >= MOMENT_MIN_LOSS][:MOMENT_LIMIT]
+    return [{"ply": m["ply"], "sentence": moment_sentence(m)} for m in sorted(picked, key=lambda m: m["ply"])]
+
+
+def with_moments(summary: Dict[str, Any], moves: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """The summary plus its turning points. Reviews saved before this existed don't have them, so fill them in on the way out."""
+    if "moments" in summary:
+        return summary
+    return {**summary, "moments": build_moments(moves, summary.get("key_moments") or [])}
+
+
 def _standing(win_stm: float, side: str) -> str:
     other = "Black" if side == "white" else "White"
     me = side.capitalize()

@@ -138,14 +138,26 @@ function summaryFromMoves() {
 }
 
 /* ---------- board rendering ---------- */
-function xy(sq) { const f = FILES.indexOf(sq[0]), r = +sq[1] - 1; return S.flip ? [(7 - f) * 100, r * 100] : [f * 100, (7 - r) * 100]; }
-function arrowSvg(a) {
-  const [x1, y1] = xy(a.from).map(v => v + 50), [x2, y2] = xy(a.to).map(v => v + 50);
+function xy(sq, flip = S.flip) { const f = FILES.indexOf(sq[0]), r = +sq[1] - 1; return flip ? [(7 - f) * 100, r * 100] : [f * 100, (7 - r) * 100]; }
+function arrowSvg(a, flip = S.flip, k = 1) {      // k > 1 draws a bolder arrow, for the small boards
+  const [x1, y1] = xy(a.from, flip).map(v => v + 50), [x2, y2] = xy(a.to, flip).map(v => v + 50);
   const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1, ux = dx / len, uy = dy / len;
-  const head = 34, w = 11, bx = x2 - ux * head, by = y2 - uy * head, sx = x1 + ux * 18, sy = y1 + uy * 18;
+  const head = 34 * (1 + (k - 1) * .5), w = 11 * k, wing = 24 * k, bx = x2 - ux * head, by = y2 - uy * head, sx = x1 + ux * 18, sy = y1 + uy * 18;
   const px = -uy, py = ux, col = ARROW[a.color] || ARROW.green;
-  const pts = [[sx + px * w / 2, sy + py * w / 2], [bx + px * w / 2, by + py * w / 2], [bx + px * 24, by + py * 24], [x2 - ux * 4, y2 - uy * 4], [bx - px * 24, by - py * 24], [bx - px * w / 2, by - py * w / 2], [sx - px * w / 2, sy - py * w / 2]];
+  const pts = [[sx + px * w / 2, sy + py * w / 2], [bx + px * w / 2, by + py * w / 2], [bx + px * wing, by + py * wing], [x2 - ux * 4, y2 - uy * 4], [bx - px * wing, by - py * wing], [bx - px * w / 2, by - py * w / 2], [sx - px * w / 2, sy - py * w / 2]];
   return `<polygon points="${pts.map(p => p.join(',')).join(' ')}" fill="${col}" opacity=".82"/>`;
+}
+function pieceSvg(ch, x, y) {
+  const white = ch === ch.toUpperCase();
+  return `<text x="${x + 50}" y="${y + 74}" font-size="84" text-anchor="middle" fill="${white ? '#fff' : '#1b1b1b'}" stroke="${white ? '#2a2a2a' : '#e8e8e8'}" stroke-width="2.4" paint-order="stroke" style="font-family:'Apple Symbols','Segoe UI Symbol','DejaVu Sans',sans-serif">${GLYPH[ch.toUpperCase()]}&#xFE0E;</text>`;
+}
+// A small read-only board: this position, seen from `flip`'s side, with arrows
+function miniBoardSvg(fen, flip, arrows) {
+  const pos = parseFen(fen), parts = [];
+  for (let i = 0; i < 64; i++) { const [x, y] = xy(sqName(i), flip), light = ((i % 8) + Math.floor(i / 8)) % 2 === 1; parts.push(`<rect x="${x}" y="${y}" width="100" height="100" fill="${light ? 'var(--sq-light)' : 'var(--sq-dark)'}"/>`); }
+  for (let i = 0; i < 64; i++) if (pos.b[i]) { const [x, y] = xy(sqName(i), flip); parts.push(pieceSvg(pos.b[i], x, y)); }
+  arrows.filter(Boolean).forEach(a => parts.push(arrowSvg(a, flip, 2)));
+  return `<svg viewBox="0 0 800 800" aria-hidden="true">${parts.join('')}</svg>`;
 }
 function currentOverlays() {
   const fen = curFen(), p = S.ply, out = { last: null, badge: null, arrows: [], hang: [], heat: null, vis: null };
@@ -191,8 +203,8 @@ function renderBoard() {
     parts.push(cap ? `<circle cx="${x + 50}" cy="${y + 50}" r="46" fill="none" stroke="#1d2433" stroke-opacity=".45" stroke-width="9"/>` : `<circle cx="${x + 50}" cy="${y + 50}" r="15" fill="#1d2433" opacity=".35"/>`); });
   for (let i = 0; i < 64; i++) {
     const ch = pos.b[i]; if (!ch) continue;
-    const [x, y] = xy(sqName(i)), white = ch === ch.toUpperCase();
-    parts.push(`<text x="${x + 50}" y="${y + 74}" font-size="84" text-anchor="middle" fill="${white ? '#fff' : '#1b1b1b'}" stroke="${white ? '#2a2a2a' : '#e8e8e8'}" stroke-width="2.4" paint-order="stroke" style="font-family:'Apple Symbols','Segoe UI Symbol','DejaVu Sans',sans-serif">${GLYPH[ch.toUpperCase()]}&#xFE0E;</text>`);
+    const [x, y] = xy(sqName(i));
+    parts.push(pieceSvg(ch, x, y));
   }
   [...ov.arrows, ...S.coachDraw.arrows].forEach(a => parts.push(arrowSvg(a)));
   if (ov.badge) { const [x, y] = xy(ov.badge.sq); parts.push(`<g><title>${LABELS[ov.badge.label][1]}</title><circle cx="${x + 86}" cy="${y + 14}" r="19" fill="${BADGE_COLOR[ov.badge.label]}" stroke="#fff" stroke-width="3"/><text x="${x + 86}" y="${y + 21}" font-size="${LABELS[ov.badge.label][0].length > 1 ? 17 : 21}" font-weight="800" fill="#fff" text-anchor="middle">${LABELS[ov.badge.label][0]}</text></g>`); }
@@ -264,6 +276,24 @@ function renderMoveCard() {
   if (ERRORS.includes(m.label) && m.best) html += `<button class="btn sm bestbtn" id="tryBest">Try ${esc(m.best.san)} instead</button> <span class="muted small">Line: ${esc(m.best.pv_san.join(' '))}</span>`;
   el.innerHTML = `<div class="movecard">${html}</div>`;
   const tb = $('#tryBest'); if (tb) tb.onclick = () => { S.explore = null; startExplore(S.fens[S.ply - 1], [m.best.uci]); setTab('lines'); };
+}
+// The turning points of the game: server-picked plies and one-sentence explanations, drawn on mini boards of the position before the move
+function renderMoments() {
+  const el = $('#momentsBox'), list = S.summary && S.summary.moments;
+  if (!list) { el.innerHTML = ''; return; }
+  if (!list.length) { el.innerHTML = '<div class="card"><h3>Moments that decided this game</h3><p class="muted small" style="margin:8px 0 0">No big turning points: neither player gave away much in a single move.</p></div>'; return; }
+  const me = S.me.toLowerCase();
+  const cards = list.map(({ ply, sentence }) => {
+    const m = S.moves[ply - 1]; if (!m) return '';
+    const name = S.game.meta[m.mover], who = me && name.toLowerCase() === me ? 'You' : name, no = `${Math.ceil(ply / 2)}${ply % 2 ? '.' : '...'} ${m.san}`;
+    return `<button class="moment${S.ply === ply ? ' cur' : ''}" data-ply="${ply}" aria-label="${esc(`${LABELS[m.label][1]}, move ${no}, by ${who}. ${sentence}`)}">` +
+      `<span class="mb">${miniBoardSvg(m.fen_before, m.mover === 'black', [m.arrows.played, m.arrows.best])}</span>` +
+      `<span class="mt"><span class="mh"><b>${esc(no)}</b>${badge(m.label)}<span class="ml">${LABELS[m.label][1]}</span></span>` +
+      `<span class="mwho"><i class="sw ${m.mover}"></i>${esc(who)}</span><span class="ms">${esc(sentence)}</span>` +
+      `<span class="mlg"><span><i style="background:${ARROW.blue}"></i>Played ${esc(m.san)}</span>${m.best ? `<span><i style="background:${ARROW.green}"></i>Better ${esc(m.best.san)}</span>` : ''}</span></span></button>`;
+  }).join('');
+  el.innerHTML = `<div class="card"><h3>Moments that decided this game</h3><div class="moments">${cards}</div></div>`;
+  $$('#momentsBox [data-ply]').forEach(b => b.onclick = () => goTo(+b.dataset.ply));
 }
 function renderSummary() {
   const el = $('#summaryBox'); if (!S.moves.length) { el.innerHTML = ''; return; }
@@ -405,7 +435,7 @@ function togglePlay() {
   S.playing = setInterval(() => { if (S.ply >= S.fens.length - 1) return stopPlay(); goTo(S.ply + 1, false); }, 900);
 }
 function renderAll() {
-  renderBoard(); renderEval(); renderPlayers(); renderGraph(); renderMoveCard(); renderSummary(); renderMoveList();
+  renderBoard(); renderEval(); renderPlayers(); renderGraph(); renderMoments(); renderMoveCard(); renderSummary(); renderMoveList();
   if (S.tab === 'lines') renderLines();
 }
 

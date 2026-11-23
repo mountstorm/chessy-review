@@ -7,6 +7,7 @@ from typing import Any, Dict, List
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import delete, select
 
+from ..coach.offline import with_moments
 from ..engine.review import review_game
 from ..engine.scope import engine_scope
 from ..models.db import Game, MoveRow, Review
@@ -132,7 +133,8 @@ async def get_review(game_id: str, request: Request, depth: int | None = None, m
         r, rows = await _load_review(s, game_id, depth, multipv)
         if not r:
             raise HTTPException(404, "No completed review for this game yet. POST /analyze first.")
-        return {"depth": r.depth, "multipv": r.multipv, "summary": r.summary, "moves": [m.data for m in rows]}
+        moves = [m.data for m in rows]
+        return {"depth": r.depth, "multipv": r.multipv, "summary": with_moments(r.summary, moves), "moves": moves}
 
 
 def _move_row(review_id: str, d: Dict[str, Any]) -> MoveRow:
@@ -167,7 +169,7 @@ async def analyze(game_id: str, body: AnalyzeRequest, request: Request):
                                         "replay": True, "game": game_info, "depth": depth})
                     for i, row in enumerate(rows):
                         yield sse("move", {"move": row.data, "progress": {"done": i + 1, "total": len(rows)}})
-                    yield sse("summary", {"summary": review.summary})
+                    yield sse("summary", {"summary": with_moments(review.summary, [r.data for r in rows])})
                     yield sse("done", {"review_id": review.id, "cached": True})
                     return
                 if review:
@@ -177,16 +179,19 @@ async def analyze(game_id: str, body: AnalyzeRequest, request: Request):
                 review = Review(game_id=game_id, depth=depth, multipv=body.multipv, complete=False)
                 s.add(review)
                 await s.commit()
+                seen: List[Dict[str, Any]] = []
                 async with engine_scope(request.app) as pool:
                     async for ev in review_game(pool, start_fen, nodes, depth, body.multipv):
                         t = ev["type"]
                         if t == "start":
                             yield sse("start", {**ev, "replay": False, "game": game_info, "depth": depth})
                         elif t == "move":
+                            seen.append(ev["move"])
                             s.add(_move_row(review.id, ev["move"]))
                             await s.commit()
                             yield sse("move", ev)
                         elif t == "summary":
+                            ev = {**ev, "summary": with_moments(ev["summary"], seen)}
                             review.summary = ev["summary"]
                             review.complete = True
                             await s.commit()
@@ -217,12 +222,17 @@ async def _hosted_analyze(body: AnalyzeRequest, request: Request):
 
     async def gen():
         try:
+            seen: List[Dict[str, Any]] = []
             async with engine_scope(request.app) as pool:
                 async for ev in review_game(pool, pg.tree["fen"], nodes, depth, body.multipv):
                     t = ev["type"]
                     if t == "start":
                         yield sse("start", {**ev, "replay": False, "game": info, "depth": depth})
                     else:
+                        if t == "move":
+                            seen.append(ev["move"])
+                        elif t == "summary":
+                            ev = {**ev, "summary": with_moments(ev["summary"], seen)}
                         yield sse(t, ev)
             yield sse("done", {"cached": False})
         except Exception as e:
