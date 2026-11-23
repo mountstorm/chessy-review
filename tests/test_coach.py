@@ -386,3 +386,20 @@ async def test_cloud_refusal_is_not_second_guessed(pool):
     evs = await _cloud(pool, _Cloud(["Nxe5"], refused=True))
     kinds = [e["type"] for e in evs]
     assert "error" in kinds and "replace" not in kinds
+
+
+# ---------------------------------------------------------------- the grounding event reports how deep Stockfish looked
+@needs_engine
+async def test_grounding_event_carries_the_engine_depth_the_facts_came_from(pool):
+    for adapter in (None, _Cloud(["Ra8# is mate."]), _local(["White can play ", "Ra8#."])[0]):
+        evs = await collect(run_coach(CoachRequest(current_fen=MATE_FEN, mode="explain"), ToolExecutor(pool), adapter, get_settings()))
+        g = evs[0]
+        assert g["type"] == "grounding" and g["depth"] == 14                       # evaluate_fen is asked for depth 14
+        assert g["provider"] == (adapter.provider if adapter else "offline")
+
+
+@needs_engine
+async def test_grounding_comes_before_any_text_so_the_tag_never_precedes_the_engine(pool):
+    evs = await collect(run_coach(CoachRequest(current_fen=MATE_FEN, mode="socratic_hint"), ToolExecutor(pool), None, get_settings()))
+    kinds = [e["type"] for e in evs]
+    assert kinds[0] == "grounding" and kinds.index("grounding") < kinds.index("text")

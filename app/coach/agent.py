@@ -165,7 +165,7 @@ async def run_coach(req: CoachRequest, executor: ToolExecutor, adapter: Optional
     best = facts["lines"][0] if facts.get("lines") else None
     yield {"type": "grounding", "side_to_move": facts["side_to_move"], "eval_cp_white": facts["eval_cp_white"],
            "win_prob_white": facts["win_prob_white"], "best": best["move"] if best else None,
-           "best_uci": best["uci"] if best else None, "mode": req.mode,
+           "best_uci": best["uci"] if best else None, "mode": req.mode, "depth": facts.get("depth"),
            "provider": adapter.provider if adapter else "offline"}
 
     async def offline() -> AsyncIterator[Dict[str, Any]]:

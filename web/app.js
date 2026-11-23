@@ -498,12 +498,21 @@ async function runAnalysis(depth, multipv = 3, force = false) {
 
 /* ---------- coach ---------- */
 function addBubble(cls, text) { const b = document.createElement('div'); b.className = 'bubble ' + cls; b.textContent = text; const c = $('#chat'); c.appendChild(b); c.scrollTop = c.scrollHeight; return b; }
+// "Verified" is only as strong as what was checked, so the tooltip says what that was for this kind of coach
+function verifiedTag(g) {
+  const d = g.depth ? ` (depth ${g.depth})` : '', el = document.createElement('div');
+  el.className = 'vtag'; el.textContent = `✓ Verified by Stockfish${d}`;
+  el.title = g.provider === 'offline'
+    ? `Every sentence of this answer is built from Stockfish's own output for this position${g.depth ? `, searched to depth ${g.depth}` : ''}.`
+    : `Stockfish analyzed this position${g.depth ? ` to depth ${g.depth}` : ''} before the coach answered, and every move it mentions was checked against the engine's lines. Other claims in the text are the AI's own wording.`;
+  return el;
+}
 async function coachSend(text) {
   if (S.busy) return; S.busy = true;
   const mode = S.mode, shown = text || ({ explain: 'Explain this position.', socratic_hint: 'Give me a hint.', quiz_me: 'Quiz me.' })[mode];
   addBubble('me', shown);
   const sans = [...S.nodes.slice(0, S.ply).map(n => n.san), ...(S.explore ? (S.explore.sans || []) : [])];
-  const bubble = addBubble('bot cursor', ''), chips = {}; let full = '';
+  const bubble = addBubble('bot cursor', ''), chips = {}; let full = '', grounded = null;
   const body = { game_id: S.game && !S.hosted ? S.game.id : null, current_fen: curFen(), move_history: sans, user_message: text, mode, history: S.chat.slice(-10) };
   if (S.hosted && S.game) {             // no server-side game storage: send the little context the coach needs
     const lm = !S.explore && S.ply >= 1 ? mvAt(S.ply) : null;
@@ -511,7 +520,7 @@ async function coachSend(text) {
   }
   try {
     await streamSSE('/api/coach/chat', body, {
-      grounding: d => { $('#coachProvider').textContent = d.provider === 'offline' ? 'Offline engine coach' : `AI coach · ${d.provider}`; $('#coachProvider').classList.add('good'); },
+      grounding: d => { grounded = d; $('#coachProvider').textContent = d.provider === 'offline' ? 'Offline engine coach' : `AI coach · ${d.provider}`; $('#coachProvider').classList.add('good'); },
       text: d => { full += d.delta; bubble.textContent = full; $('#chat').scrollTop = 1e9; },
       ui: d => {
         if (d.clear) S.coachDraw = { arrows: [], hl: [] };
@@ -526,7 +535,7 @@ async function coachSend(text) {
       error: d => addBubble('sys', d.message),
     });
   } catch (e) { addBubble('sys', e.message); }
-  bubble.classList.remove('cursor'); if (!full) bubble.remove();
+  bubble.classList.remove('cursor'); if (!full) bubble.remove(); else if (grounded) { bubble.after(verifiedTag(grounded)); $('#chat').scrollTop = 1e9; }
   S.chat.push({ role: 'user', content: shown }, { role: 'assistant', content: full || '(no reply)' });
   S.busy = false;
 }
