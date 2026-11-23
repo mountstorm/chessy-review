@@ -226,17 +226,27 @@ function renderChips(vis) {
   el.innerHTML = `<span class="pill">King safety <b>W ${vis.king_safety.white}</b> · <b>B ${vis.king_safety.black}</b></span><span class="pill">Mobility <b>W ${vis.mobility.white}</b> · <b>B ${vis.mobility.black}</b></span>` +
     vis.hanging.map(h => `<span class="pill" style="color:var(--bad)" title="${esc(hangTip(h))}">Hanging: ${esc(hangName(h))}${h.reason ? ` · ${esc(h.reason)}` : ''}</span>`).join('');
 }
+// Moves worth a dot on the graph, and how big: the errors that cost the game, the brilliant finds, and (smaller) great moves.
+const GRAPH_DOTS = { brilliant: 5.5, mistake: 5.5, blunder: 5.5, missed_win: 5.5, great: 4 };
 function renderGraph() {
-  const g = $('#graph'), n = Math.max(1, S.fens.length - 1), W = 600, H = 90;
+  const g = $('#graph'), n = Math.max(1, S.fens.length - 1), H = 90;
+  const W = Math.max(200, Math.round(g.getBoundingClientRect().width) || 600);      // draw at the real pixel width so dots stay round
+  g.setAttribute('viewBox', `0 0 ${W} ${H}`);
   const pts = []; for (let i = 0; i <= n; i++) { const e = S.evals[i]; if (e) pts.push([i / n * W, H * (1 - e.win)]); }
-  let svg = `<rect width="${W}" height="${H}" fill="#2a2f3f" opacity=".55"/>`;
-  if (pts.length > 1) {
-    const line = pts.map(p => p.join(',')).join(' ');
-    svg += `<polygon points="0,${H} ${pts.map(p => p.join(',')).join(' ')} ${pts[pts.length - 1][0]},${H}" fill="#eee" opacity=".92"/><polyline points="${line}" fill="none" stroke="#aeb7d0" stroke-width="1"/>`;
-  }
-  svg += `<line x1="0" y1="${H / 2}" x2="${W}" y2="${H / 2}" stroke="#7c9cff" stroke-opacity=".5" stroke-dasharray="4 4"/>`;
-  S.moves.forEach(m => { if (ERRORS.includes(m.label) && m.label !== 'inaccuracy') { const e = S.evals[m.ply]; if (e) svg += `<circle cx="${m.ply / n * W}" cy="${H * (1 - e.win)}" r="4.5" fill="${BADGE_COLOR[m.label]}" stroke="#fff" stroke-width="1"/>`; } else if (m.critical && m.critical.is_critical && !ERRORS.includes(m.label)) { const e = S.evals[m.ply]; if (e) svg += `<circle cx="${m.ply / n * W}" cy="${H * (1 - e.win)}" r="3" fill="#5b9cf5"/>`; } });
-  svg += `<line x1="${S.ply / n * W}" y1="0" x2="${S.ply / n * W}" y2="${H}" stroke="#7c9cff" stroke-width="2"/>`;
+  const known = pts.length ? pts[pts.length - 1][0] : 0;
+  // Black's side is dark, White's is light, and the boundary between them is the evaluation (up = Black is better, down = White).
+  let svg = `<rect width="${W}" height="${H}" fill="#1e222d"/>`;
+  if (pts.length > 1) svg += `<polygon points="0,${H} ${pts.map(p => p.join(',')).join(' ')} ${known},${H}" fill="#f4f5f8"/>`;
+  if (known < W - 1) svg += `<rect x="${known}" width="${W - known}" height="${H}" fill="#7d88aa" opacity=".45"/>`;      // not analyzed yet: neither side
+  svg += `<line x1="0" y1="${H / 2}" x2="${W}" y2="${H / 2}" stroke="#7d88aa" stroke-width="1.5"/>`;                   // equal position
+  S.moves.forEach(m => {
+    const r = GRAPH_DOTS[m.label], e = S.evals[m.ply]; if (!r || !e) return;
+    const x = m.ply / n * W, y = Math.min(H - 7, Math.max(7, H * (1 - e.win)));
+    svg += `<g><title>${Math.ceil(m.ply / 2)}${m.ply % 2 ? '.' : '...'} ${esc(m.san)} · ${LABELS[m.label][1]}</title>` +
+      `<circle cx="${x}" cy="${y}" r="${r + 1.5}" fill="none" stroke="#1e222d" stroke-width="1"/>` +             // dark rim shows on the light side...
+      `<circle cx="${x}" cy="${y}" r="${r}" fill="${BADGE_COLOR[m.label]}" stroke="#fff" stroke-width="1.5"/></g>`;   // ...white rim on the dark side
+  });
+  svg += `<line x1="${S.ply / n * W}" y1="0" x2="${S.ply / n * W}" y2="${H}" stroke="#4f6df5" stroke-width="2"/>`;
   g.innerHTML = svg;
 }
 
@@ -578,6 +588,7 @@ function init() {
   $('#bFirst').onclick = () => goTo(0); $('#bPrev').onclick = () => goTo(S.ply - 1); $('#bNext').onclick = () => goTo(S.ply + 1); $('#bLast').onclick = () => goTo(1e6);
   $('#bPlay').onclick = togglePlay; $('#bFlip').onclick = () => { S.flip = !S.flip; renderAll(); };
   $$('#overlays [data-ov]').forEach(c => c.onchange = () => { S.overlays[c.dataset.ov] = c.checked; renderBoard(); });
+  window.addEventListener('resize', () => { if (S.fens.length) renderGraph(); });
   $('#graph').addEventListener('click', e => { const r = e.currentTarget.getBoundingClientRect(); goTo(Math.round((e.clientX - r.left) / r.width * (S.fens.length - 1))); });
   $('#analyzeBtn').onclick = () => runAnalysis(+$('#depthSel').value, 3, !!S.moves.length);
   $$('#rtabs .tab').forEach(b => b.onclick = () => setTab(b.dataset.rt));
