@@ -647,7 +647,19 @@ function setTab(t) {
 }
 
 /* ---------- wire up ---------- */
+// Dark by default; the button switches to light and back, and the choice is remembered (the inline script in <head> applies it before paint)
+function applyTheme(theme, remember = false) {
+  const light = theme === 'light';
+  if (light) document.documentElement.dataset.theme = 'light'; else delete document.documentElement.dataset.theme;
+  const b = $('#themeBtn'), next = light ? 'dark' : 'light';
+  if (!b) return;        // a cached older index.html has no button; never let the theme code take the app down
+  b.textContent = light ? '☾' : '☀\uFE0E'; b.setAttribute('aria-label', `Switch to ${next} theme`); b.title = `Switch to ${next} theme`;
+  const meta = document.querySelector('meta[name=theme-color]'); if (meta) meta.content = light ? '#f3f5fa' : '#12151c';
+  if (remember) { try { localStorage.setItem('chessy.theme', theme); } catch { /* private mode: the choice just won't be remembered */ } }
+}
 function init() {
+  const themeBtn = $('#themeBtn'); if (themeBtn) themeBtn.onclick = () => applyTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light', true);
+  applyTheme(document.documentElement.dataset.theme === 'light' ? 'light' : 'dark');
   $$('[data-nav]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); const v = b.dataset.nav; if (v === 'review' && !S.game) return toast('Import a game first.'); show(v); }));
   let site = 'chesscom';
   $$('#srcToggle .seg-btn').forEach(b => b.onclick = () => {
@@ -687,6 +699,7 @@ function init() {
   $('#codeForm').onsubmit = e => { e.preventDefault(); try { localStorage.setItem('chessy.code', $('#codeInput').value.trim()); } catch { /* private mode */ } $('#codeModal').hidden = true; toast('Code saved. Try again.'); };
   api('/api/health').then(h => {
     const s = $('#status'); s.classList.add('ok'); $('#statusText').textContent = h.hosted ? `${h.engine || 'Stockfish'} · hosted demo` : `${h.engine} · ${h.workers} workers · coach: ${h.coach}`;
+    s.title = $('#statusText').textContent;      // the full text, for when the header has to truncate it
     if (h.hosted) {
       S.hosted = true; $('[data-nav="insights"]').hidden = true; $('#hostedNote').hidden = false;
       $('#hostedDetails').innerHTML = `<li>Your games live in this browser tab only. Refresh or close it and they're gone.</li>` +

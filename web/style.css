@@ -1,12 +1,11 @@
 :root{
+  color-scheme:dark;
   --bg:#12151c; --panel:#1b2030; --panel2:#232a3d; --line:#2e3650; --text:#e8ecf6; --muted:#8e99b8;
   --accent:#7c9cff; --accent-ink:#0b1020; --good:#4cc38a; --warn:#f0b44c; --bad:#ef5b5b; --brilliant:#2fd3c4; --great:#5b9cf5;
   --sq-light:#ebecd0; --sq-dark:#739552; --radius:14px; --shadow:0 8px 30px rgba(0,0,0,.35);
 }
-@media (prefers-color-scheme: light){
-  :root{ --bg:#f3f5fa; --panel:#fff; --panel2:#eef1f8; --line:#d9deec; --text:#1a2036; --muted:#5f6b8c; --accent:#3557e0; --accent-ink:#fff; --shadow:0 8px 24px rgba(30,40,80,.12); }
-}
-:root[data-theme=dark]{ --bg:#12151c; --panel:#1b2030; --panel2:#232a3d; --line:#2e3650; --text:#e8ecf6; --muted:#8e99b8; --accent:#7c9cff; --accent-ink:#0b1020; }
+/* Dark is the default for everyone; light is opt-in through the toggle in the header (saved in localStorage) */
+:root[data-theme=light]{ color-scheme:light; --bg:#f3f5fa; --panel:#fff; --panel2:#eef1f8; --line:#d9deec; --text:#1a2036; --muted:#5f6b8c; --accent:#3557e0; --accent-ink:#fff; --shadow:0 8px 24px rgba(30,40,80,.12); }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -19,6 +18,8 @@ h1{font-size:clamp(28px,4vw,44px);letter-spacing:-.02em} h2{font-size:20px} h3{f
 nav{display:flex;gap:4px;flex:1}
 .navbtn{background:none;border:0;padding:8px 14px;border-radius:10px;color:var(--muted);cursor:pointer;font-weight:600}
 .navbtn:hover,.navbtn.active{background:var(--panel2);color:var(--text)}
+.themebtn{background:none;border:1px solid var(--line);border-radius:10px;width:34px;height:34px;cursor:pointer;color:var(--muted);font-size:17px;line-height:1;display:grid;place-items:center}
+.themebtn:hover{color:var(--text);border-color:var(--accent)} .themebtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .status{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
 .dot{width:9px;height:9px;border-radius:50%;background:var(--warn)} .status.ok .dot{background:var(--good)} .status.err .dot{background:var(--bad)}
 main{--pad:max(16px,3vw);max-width:1280px;margin:0 auto;padding:22px var(--pad) 60px}
@@ -88,6 +89,8 @@ textarea{width:100%;min-height:150px;resize:vertical;font-family:ui-monospace,Me
 .chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:10px 0 0 38px}
 .chips .pill b{color:var(--text)}
 .graph{width:calc(100% - 38px);margin:12px 0 0 38px;height:90px;background:var(--panel);border:1px solid var(--line);border-radius:10px;cursor:pointer;display:block}
+@media (max-width:520px){.top{gap:10px}.status{font-size:12px;line-height:1.3}}
+@media (max-width:374px){.navbtn{padding:8px 8px}.status{min-width:0;flex:1 1 0;justify-content:flex-end}#statusText{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}      /* room for the theme button without making the header taller */
 /* Phones: the board takes the whole screen width. The evaluation bar moves from beside the board to a thin strip above it, and the
    38px indent that lined everything up beside the vertical bar goes away. */
 @media (max-width:520px){
@@ -121,7 +124,7 @@ textarea{width:100%;min-height:150px;resize:vertical;font-family:ui-monospace,Me
 .phase{margin-top:10px;font-size:13px}.phname{font-weight:700;margin-bottom:2px}
 .prow{display:grid;grid-template-columns:minmax(64px,28%) 1fr 40px;gap:8px;align-items:center;margin-top:3px}
 .prow .bar{margin-top:0}.pn{display:flex;gap:6px;align-items:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pv{text-align:right;font-variant-numeric:tabular-nums}
-.sw{flex:none;width:10px;height:10px;border-radius:3px;border:1px solid var(--muted)}.sw.white{background:#fff}.sw.black{background:#1b2030}
+.sw{flex:none;width:10px;height:10px;border-radius:3px;border:1px solid var(--muted)}.sw.white{background:#fff}.sw.black{background:#0a0c12}
 .movelist{max-height:45vh;overflow-y:auto;overscroll-behavior:contain;position:relative;padding-right:8px}
 .moves-grid{display:grid;grid-template-columns:36px 1fr 1fr;gap:2px 6px;align-items:center}
 .moves-grid .no{color:var(--muted);font-size:12px;text-align:right}
