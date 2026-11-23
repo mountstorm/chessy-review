@@ -15,6 +15,9 @@ const LABELS = {
 };
 const BADGE_COLOR = { brilliant: '#2fd3c4', great: '#5b9cf5', best: '#4cc38a', inaccuracy: '#f0b44c', mistake: '#ee8a3c', blunder: '#ef5b5b', missed_win: '#c04bd6' };
 const ERRORS = ['inaccuracy', 'mistake', 'blunder', 'missed_win'];
+// A classification icon. Symbols alone are cryptic, so every one carries its name as a tooltip and for screen readers
+// (decorative = true when the name is already printed right next to it).
+const badge = (k, decorative = false) => `<i class="badge b-${k}" style="min-width:18px;height:18px;font-size:10px" ${decorative ? 'aria-hidden="true"' : `role="img" title="${LABELS[k][1]}" aria-label="${LABELS[k][1]}"`}>${LABELS[k][0]}</i>`;
 const EXAMPLE = `[White "Alice"]\n[Black "Bob"]\n[Result "1-0"]\n[Opening "Italian Game"]\n\n1. e4 e5 2. Nf3 Nc6 3. Bc4 Nf6 4. Ng5 d5 5. exd5 Nxd5 6. Nxf7 Kxf7 7. Qf3+ Ke6 8. Nc3 Nb4 9. Qe4 c6 10. a3 Na6 11. d4 Nac7 12. Bf4 1-0`;
 
 /* ---------- state ---------- */
@@ -186,7 +189,7 @@ function renderBoard() {
     parts.push(`<text x="${x + 50}" y="${y + 74}" font-size="84" text-anchor="middle" fill="${white ? '#fff' : '#1b1b1b'}" stroke="${white ? '#2a2a2a' : '#e8e8e8'}" stroke-width="2.4" paint-order="stroke" style="font-family:'Apple Symbols','Segoe UI Symbol','DejaVu Sans',sans-serif">${GLYPH[ch.toUpperCase()]}&#xFE0E;</text>`);
   }
   [...ov.arrows, ...S.coachDraw.arrows].forEach(a => parts.push(arrowSvg(a)));
-  if (ov.badge) { const [x, y] = xy(ov.badge.sq); parts.push(`<g><circle cx="${x + 86}" cy="${y + 14}" r="19" fill="${BADGE_COLOR[ov.badge.label]}" stroke="#fff" stroke-width="3"/><text x="${x + 86}" y="${y + 21}" font-size="${LABELS[ov.badge.label][0].length > 1 ? 17 : 21}" font-weight="800" fill="#fff" text-anchor="middle">${LABELS[ov.badge.label][0]}</text></g>`); }
+  if (ov.badge) { const [x, y] = xy(ov.badge.sq); parts.push(`<g><title>${LABELS[ov.badge.label][1]}</title><circle cx="${x + 86}" cy="${y + 14}" r="19" fill="${BADGE_COLOR[ov.badge.label]}" stroke="#fff" stroke-width="3"/><text x="${x + 86}" y="${y + 21}" font-size="${LABELS[ov.badge.label][0].length > 1 ? 17 : 21}" font-weight="800" fill="#fff" text-anchor="middle">${LABELS[ov.badge.label][0]}</text></g>`); }
   $('#boardHost').innerHTML = `<svg id="boardSvg" viewBox="0 0 800 800" role="img" aria-label="Chess board">${parts.join('')}</svg>`;
   $('#boardSvg').addEventListener('click', onBoardClick);
   renderChips(ov.vis);
@@ -249,17 +252,22 @@ function renderMoveCard() {
 function renderSummary() {
   const el = $('#summaryBox'); if (!S.moves.length) { el.innerHTML = ''; return; }
   const sm = summaryFromMoves(), order = ['brilliant', 'great', 'best', 'inaccuracy', 'mistake', 'blunder', 'missed_win'];
-  const box = side => `<div class="accbox"><div class="who">${esc(S.game.meta[side])}</div><div class="big">${sm[side].acc != null ? sm[side].acc.toFixed(0) + '%' : '–'}</div><div class="counts">${order.map(k => `<span><i class="badge b-${k}" style="min-width:18px;height:18px;font-size:10px">${LABELS[k][0]}</i>${sm[side].counts[k] || 0}</span>`).join('')}</div></div>`;
-  const ph = ['opening', 'middlegame', 'endgame'].map(p => { const a = [...(sm.white.phases[p] || []), ...(sm.black.phases[p] || [])]; if (!a.length) return ''; const v = a.reduce((x, y) => x + y, 0) / a.length; return `<div class="phase"><div class="row"><span>${p[0].toUpperCase() + p.slice(1)}</span><span>${v.toFixed(0)}%</span></div><div class="bar"><i style="width:${v}%"></i></div></div>`; }).join('');
+  const box = side => `<div class="accbox"><div class="who">${esc(S.game.meta[side])}</div><div class="big">${sm[side].acc != null ? sm[side].acc.toFixed(0) + '%' : '–'}</div><div class="counts">${order.map(k => `<div class="${sm[side].counts[k] ? '' : 'zero'}">${badge(k, true)}<span>${LABELS[k][1]}</span><b>${sm[side].counts[k] || 0}</b></div>`).join('')}</div></div>`;
+  const sides = S.flip ? ['black', 'white'] : ['white', 'black'];
+  const avg = a => a.reduce((x, y) => x + y, 0) / a.length;
+  const ph = ['opening', 'middlegame', 'endgame'].map(p => {
+    const rows = sides.filter(sd => (sm[sd].phases[p] || []).length).map(sd => { const v = avg(sm[sd].phases[p]); return `<div class="prow"><span class="pn"><i class="sw ${sd}"></i>${esc(S.game.meta[sd])}</span><div class="bar"><i style="width:${v}%"></i></div><span class="pv">${v.toFixed(0)}%</span></div>`; }).join('');
+    return rows ? `<div class="phase"><div class="phname">${p[0].toUpperCase() + p.slice(1)}</div>${rows}</div>` : '';
+  }).join('');
   const keys = (S.summary ? S.summary.key_moments : S.moves.filter(m => ERRORS.includes(m.label)).sort((a, b) => b.loss - a.loss).slice(0, 6).map(m => m.ply));
-  const km = keys.map(p => { const m = S.moves[p - 1]; return m ? `<button data-ply="${p}"><span class="badge b-${m.label}" style="min-width:18px;height:18px;font-size:10px">${LABELS[m.label][0]}</span> ${Math.ceil(p / 2)}${p % 2 ? '.' : '...'} ${esc(m.san)}</button>` : ''; }).join('');
-  el.innerHTML = `<div class="card"><div class="cards">${box(S.flip ? 'black' : 'white')}${box(S.flip ? 'white' : 'black')}</div>${ph}${km ? `<h3 style="margin-top:14px">Key moments</h3><div class="keymoments">${km}</div>` : ''}</div>`;
+  const km = keys.map(p => { const m = S.moves[p - 1]; return m ? `<button data-ply="${p}" aria-label="${LABELS[m.label][1]}: move ${Math.ceil(p / 2)}${p % 2 ? '.' : '...'} ${esc(m.san)}">${badge(m.label)} ${Math.ceil(p / 2)}${p % 2 ? '.' : '...'} ${esc(m.san)}</button>` : ''; }).join('');
+  el.innerHTML = `<div class="card"><div class="cards">${box(S.flip ? 'black' : 'white')}${box(S.flip ? 'white' : 'black')}</div>${ph ? `<h3 style="margin-top:14px">Accuracy by phase</h3>${ph}` : ''}${km ? `<h3 style="margin-top:14px">Key moments</h3><div class="keymoments">${km}</div>` : ''}</div>`;
   $$('#summaryBox [data-ply]').forEach(b => b.onclick = () => goTo(+b.dataset.ply));
 }
 function renderMoveList() {
   const el = $('#moveList'), rows = [];
   for (let i = 0; i < S.nodes.length; i += 2) {
-    const cell = k => { const n = S.nodes[k]; if (!n) return '<span></span>'; const m = S.moves[k], lab = m && BADGE_COLOR[m.label] && m.label !== 'best' ? `<span class="tag t-${m.label}">${LABELS[m.label][0]}</span>` : ''; return `<button class="mv ${!S.explore && S.ply === k + 1 ? 'cur' : ''}" data-ply="${k + 1}">${esc(n.san)}${lab}</button>`; };
+    const cell = k => { const n = S.nodes[k]; if (!n) return '<span></span>'; const m = S.moves[k], lab = m && BADGE_COLOR[m.label] && m.label !== 'best' ? `<span class="tag t-${m.label}" role="img" title="${LABELS[m.label][1]}" aria-label="${LABELS[m.label][1]}">${LABELS[m.label][0]}</span>` : ''; return `<button class="mv ${!S.explore && S.ply === k + 1 ? 'cur' : ''}" data-ply="${k + 1}">${esc(n.san)}${lab}</button>`; };
     rows.push(`<span class="no">${i / 2 + 1}.</span>${cell(i)}${cell(i + 1)}`);
   }
   const keep = el.scrollTop;
