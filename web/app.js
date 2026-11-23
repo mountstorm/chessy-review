@@ -510,14 +510,15 @@ async function loadLibrary() {
 }
 async function doImport(body, btn) {
   const msg = $('#importMsg'); msg.className = 'msg'; msg.textContent = ''; btn.disabled = true;
+  const label = btn.textContent; if (btn.dataset.busy) btn.textContent = btn.dataset.busy;
   try {
     const r = await api('/api/games/import', { method: 'POST', body });
     if (r.hosted) { r.games.forEach(g => { S.hostedGames[g.id] = g; }); const ids = new Set(r.games.map(g => g.id)); S.games = [...r.games, ...S.games.filter(g => !ids.has(g.id))]; }
     await loadLibrary();
     if (r.games.length === 1) await openGame(r.games[0].id, true);
     else { msg.className = 'msg ok'; msg.textContent = `Imported ${r.games.length} games. Pick one below.`; }
-  } catch (e) { msg.textContent = e.message; }
-  btn.disabled = false;
+  } catch (e) { msg.textContent = e instanceof TypeError && /fetch|network|load failed/i.test(e.message) ? "Couldn't reach Chessy's server. Check your connection and try again." : e.message; }
+  btn.disabled = false; btn.textContent = label;
 }
 function show(view) {
   $$('.view').forEach(v => v.hidden = v.id !== 'view-' + view);
@@ -534,12 +535,22 @@ function setTab(t) {
 /* ---------- wire up ---------- */
 function init() {
   $$('[data-nav]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); const v = b.dataset.nav; if (v === 'review' && !S.game) return toast('Import a game first.'); show(v); }));
-  $$('#importTabs .tab').forEach(b => b.onclick = () => { $$('#importTabs .tab').forEach(x => x.classList.toggle('active', x === b)); ['pgn', 'chesscom', 'lichess'].forEach(k => $('#src-' + k).hidden = k !== b.dataset.src); });
+  let site = 'chesscom';
+  $$('#srcToggle .seg-btn').forEach(b => b.onclick = () => {
+    site = b.dataset.site;
+    $$('#srcToggle .seg-btn').forEach(x => { const on = x === b; x.classList.toggle('active', on); x.setAttribute('aria-pressed', on); });
+    $('#userInput').placeholder = (site === 'chesscom' ? 'Chess.com' : 'Lichess') + ' username'; $('#importMsg').textContent = ''; $('#userInput').focus();
+  });
+  $('#importForm').onsubmit = e => {
+    e.preventDefault();
+    const u = $('#userInput').value.trim(), msg = $('#importMsg'), name = site === 'chesscom' ? 'Chess.com' : 'Lichess';
+    if (!u) { msg.className = 'msg'; msg.textContent = `Enter your ${name} username.`; $('#userInput').focus(); return; }
+    doImport({ [site === 'chesscom' ? 'chesscom_username' : 'lichess_username']: u, max_games: +$('#userN').value }, $('#importUser'));
+  };
+  $('#advToggle').onclick = () => { const open = $('#advanced').hidden; $('#advanced').hidden = !open; $('#advToggle').setAttribute('aria-expanded', open); if (open) $('#pgnText').focus(); };
   $('#importPgn').onclick = e => { const t = $('#pgnText').value.trim(); if (!t) return toast('Paste a PGN or some moves first.'); doImport({ pgn: t }, e.target); };
-  $('#loadExample').onclick = e => { $('#pgnText').value = EXAMPLE; doImport({ pgn: EXAMPLE }, e.target); };      // load, import and analyze in one click
+  $('#loadExample').onclick = e => doImport({ pgn: EXAMPLE }, e.target);      // load, import and analyze in one click
   $('#pgnFile').onchange = async e => { const f = e.target.files[0]; if (f) $('#pgnText').value = await f.text(); };
-  $('#importCc').onclick = e => { const u = $('#ccUser').value.trim(); if (!u) return toast('Enter a username.'); doImport({ chesscom_username: u, max_games: +$('#ccN').value }, e.target); };
-  $('#importLi').onclick = e => { const u = $('#liUser').value.trim(); if (!u) return toast('Enter a username.'); doImport({ lichess_username: u, max_games: +$('#liN').value }, e.target); };
   $('#bFirst').onclick = () => goTo(0); $('#bPrev').onclick = () => goTo(S.ply - 1); $('#bNext').onclick = () => goTo(S.ply + 1); $('#bLast').onclick = () => goTo(1e6);
   $('#bPlay').onclick = togglePlay; $('#bFlip').onclick = () => { S.flip = !S.flip; renderAll(); };
   $$('#overlays [data-ov]').forEach(c => c.onchange = () => { S.overlays[c.dataset.ov] = c.checked; renderBoard(); });

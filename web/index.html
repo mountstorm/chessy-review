@@ -26,20 +26,24 @@
     </div>
     <p class="muted small" id="hostedNote" hidden style="text-align:center;max-width:720px;margin:0 auto 14px"></p>
     <div class="import card">
-      <div class="tabs" role="tablist" id="importTabs">
-        <button class="tab active" data-src="pgn">Paste PGN / moves</button>
-        <button class="tab" data-src="chesscom">Chess.com</button>
-        <button class="tab" data-src="lichess">Lichess</button>
+      <form id="importForm" autocomplete="off">
+        <div class="seg" id="srcToggle" role="group" aria-label="Where are your games?">
+          <button type="button" class="seg-btn active" data-site="chesscom" aria-pressed="true">Chess.com</button>
+          <button type="button" class="seg-btn" data-site="lichess" aria-pressed="false">Lichess</button>
+        </div>
+        <div class="row userrow">
+          <input id="userInput" type="text" placeholder="Chess.com username" aria-label="Username" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off">
+          <select id="userN" aria-label="How many recent games"><option value="3">3 games</option><option value="5" selected>5 games</option><option value="10">10 games</option></select>
+          <button type="submit" class="btn primary" id="importUser" data-busy="Fetching…">Fetch recent games</button>
+        </div>
+      </form>
+      <div class="row altrow">
+        <button type="button" class="btn ghost" id="loadExample">Try an example game</button>
+        <button type="button" class="linkbtn" id="advToggle" aria-expanded="false" aria-controls="advanced">Advanced: paste PGN</button>
       </div>
-      <div id="src-pgn" class="src">
-        <textarea id="pgnText" spellcheck="false" placeholder="Paste a PGN, or just moves like:  1. e4 e5 2. Nf3 Nc6 3. Bc4 …"></textarea>
-        <div class="row"><button class="btn primary" id="importPgn">Import game</button><button class="btn ghost" id="loadExample">Load example</button><label class="btn ghost file">Upload .pgn<input type="file" id="pgnFile" accept=".pgn,.txt" hidden></label></div>
-      </div>
-      <div id="src-chesscom" class="src" hidden>
-        <div class="row"><input id="ccUser" placeholder="Chess.com username" autocomplete="off"><select id="ccN"><option>3</option><option selected>5</option><option>10</option></select><button class="btn primary" id="importCc">Fetch recent games</button></div>
-      </div>
-      <div id="src-lichess" class="src" hidden>
-        <div class="row"><input id="liUser" placeholder="Lichess username" autocomplete="off"><select id="liN"><option>3</option><option selected>5</option><option>10</option></select><button class="btn primary" id="importLi">Fetch recent games</button></div>
+      <div id="advanced" class="src" hidden>
+        <textarea id="pgnText" spellcheck="false" aria-label="PGN or moves" placeholder="Paste a PGN, or just moves like:  1. e4 e5 2. Nf3 Nc6 3. Bc4 …"></textarea>
+        <div class="row"><button class="btn primary" id="importPgn">Import game</button><label class="btn ghost file">Upload .pgn<input type="file" id="pgnFile" accept=".pgn,.txt" hidden></label></div>
       </div>
       <p class="msg" id="importMsg" role="alert"></p>
     </div>
