@@ -5,7 +5,7 @@ from typing import Dict, List, Optional
 
 import chess
 
-from .motifs import VAL, hanging
+from .motifs import VAL, hanging_reasons
 
 
 def king_safety(board: chess.Board, color: bool) -> int:
@@ -61,10 +61,9 @@ def control_heatmap(board: chess.Board) -> List[int]:
 
 def hanging_squares(board: chess.Board) -> List[Dict]:
     out = []
-    for m in hanging(board):
-        sq = m.squares[0]
-        p = board.piece_at(chess.parse_square(sq))
-        out.append({"square": sq, "color": chess.COLOR_NAMES[p.color], "piece": p.symbol().upper()})
+    for sq_i, why in hanging_reasons(board):
+        p = board.piece_at(sq_i)
+        out.append({"square": chess.square_name(sq_i), "color": chess.COLOR_NAMES[p.color], "piece": p.symbol().upper(), "reason": why})
     return out
 
 

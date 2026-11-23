@@ -4,7 +4,7 @@ reports which patterns a given move brings about for the mover."""
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from typing import List
+from typing import List, Tuple
 
 import chess
 
@@ -38,8 +38,9 @@ def _side(color: bool) -> str:
     return "white" if color == chess.WHITE else "black"
 
 
-def hanging(board: chess.Board) -> List[Motif]:
-    """Pieces that can be won: attacked by the enemy and undefended, or attacked by something cheaper."""
+def hanging_reasons(board: chess.Board) -> List[Tuple[int, str]]:
+    """(square, why) for every piece that can be won: attacked by the enemy and undefended, or attacked by something
+    cheaper. A plain attack/defence count; it does not look at what the engine thinks happens next."""
     out = []
     for sq, piece in board.piece_map().items():
         if piece.piece_type == chess.KING:
@@ -50,11 +51,18 @@ def hanging(board: chess.Board) -> List[Motif]:
             continue
         defenders = board.attackers(piece.color, sq)
         cheapest = min(VAL[board.piece_at(a).piece_type] for a in attackers)
-        if not defenders or cheapest < VAL[piece.piece_type]:
-            out.append(Motif("hanging", _side(enemy), (chess.square_name(sq),),
-                             f"{_name(board, sq)} can be captured "
-                             f"({'undefended' if not defenders else 'by a cheaper piece'})"))
+        if not defenders:
+            out.append((sq, "undefended"))
+        elif cheapest < VAL[piece.piece_type]:
+            out.append((sq, "by a cheaper piece"))
     return out
+
+
+def hanging(board: chess.Board) -> List[Motif]:
+    """Pieces that can be won: attacked by the enemy and undefended, or attacked by something cheaper."""
+    return [Motif("hanging", _side(not board.piece_at(sq).color), (chess.square_name(sq),),
+                  f"{_name(board, sq)} can be captured ({why})")
+            for sq, why in hanging_reasons(board)]
 
 
 def _line_behind(board: chess.Board, slider: int, front: int) -> List[int]:

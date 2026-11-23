@@ -15,6 +15,12 @@ const LABELS = {
 };
 const BADGE_COLOR = { brilliant: '#2fd3c4', great: '#5b9cf5', best: '#4cc38a', inaccuracy: '#f0b44c', mistake: '#ee8a3c', blunder: '#ef5b5b', missed_win: '#c04bd6' };
 const ERRORS = ['inaccuracy', 'mistake', 'blunder', 'missed_win'];
+// "Hanging" is a plain attack/defence count after the move; the engine rating also looks at what happens next. So the piece
+// that just made a Best/Great/Brilliant move is not flagged (it would contradict the rating), and the markers that remain say why.
+const PIECE_NAME = { K: 'king', Q: 'queen', R: 'rook', B: 'bishop', N: 'knight', P: 'pawn' };
+const hangingFor = m => (m.visuals.hanging || []).filter(h => !(h.square === m.uci.slice(2, 4) && ['brilliant', 'great', 'best'].includes(m.label)));
+const hangName = h => `${h.color} ${PIECE_NAME[h.piece] || 'piece'} on ${h.square}`;
+const hangTip = h => `${hangName(h)} can be captured${h.reason ? ` (${h.reason})` : ''}. This is a simple attack/defence count; the engine's rating also considers what happens next.`;
 // A classification icon. Symbols alone are cryptic, so every one carries its name as a tooltip and for screen readers
 // (decorative = true when the name is already printed right next to it).
 const badge = (k, decorative = false) => `<i class="badge b-${k}" style="min-width:18px;height:18px;font-size:10px" ${decorative ? 'aria-hidden="true"' : `role="img" title="${LABELS[k][1]}" aria-label="${LABELS[k][1]}"`}>${LABELS[k][0]}</i>`;
@@ -153,9 +159,9 @@ function currentOverlays() {
     if (m) {
       if (BADGE_COLOR[m.label]) out.badge = { sq: m.uci.slice(2, 4), label: m.label };
       if (S.overlays.best && m.arrows.best) out.arrows.push(m.arrows.best);
-      if (S.overlays.hang) out.hang = m.visuals.hanging;
+      if (S.overlays.hang) out.hang = hangingFor(m);
       if (S.overlays.heat) out.heat = m.visuals.heatmap;
-      out.vis = m.visuals;
+      out.vis = { ...m.visuals, hanging: hangingFor(m) };
     }
   }
   const nxt = mvAt(p + 1);
@@ -174,7 +180,7 @@ function renderBoard() {
     if (ov.heat) { const v = ov.heat[i]; if (v) parts.push(`<rect x="${x}" y="${y}" width="100" height="100" fill="${v > 0 ? '#3b82f6' : '#ef4444'}" opacity="${Math.min(.55, Math.abs(v) * .16)}"/>`); }
     if (S.sel === name) parts.push(`<rect x="${x}" y="${y}" width="100" height="100" fill="#7c9cff" opacity=".55"/>`);
   }
-  ov.hang.forEach(h => { const [x, y] = xy(h.square); parts.push(`<circle cx="${x + 50}" cy="${y + 50}" r="44" fill="none" stroke="#ef4444" stroke-width="7" stroke-dasharray="14 8" opacity=".9"/>`); });
+  ov.hang.forEach(h => { const [x, y] = xy(h.square); parts.push(`<circle cx="${x + 50}" cy="${y + 50}" r="44" fill="transparent" stroke="#ef4444" stroke-width="7" stroke-dasharray="14 8" opacity=".9"><title>${esc(hangTip(h))}</title></circle>`); });
   // coordinates
   for (let k = 0; k < 8; k++) {
     const fileName = S.flip ? FILES[7 - k] : FILES[k], rankName = S.flip ? k + 1 : 8 - k;
@@ -218,7 +224,7 @@ function renderChips(vis) {
   const el = $('#chips');
   if (!vis) { el.innerHTML = ''; return; }
   el.innerHTML = `<span class="pill">King safety <b>W ${vis.king_safety.white}</b> · <b>B ${vis.king_safety.black}</b></span><span class="pill">Mobility <b>W ${vis.mobility.white}</b> · <b>B ${vis.mobility.black}</b></span>` +
-    (vis.hanging.length ? `<span class="pill" style="color:var(--bad)">Hanging: ${vis.hanging.map(h => h.square).join(', ')}</span>` : '');
+    vis.hanging.map(h => `<span class="pill" style="color:var(--bad)" title="${esc(hangTip(h))}">Hanging: ${esc(hangName(h))}${h.reason ? ` · ${esc(h.reason)}` : ''}</span>`).join('');
 }
 function renderGraph() {
   const g = $('#graph'), n = Math.max(1, S.fens.length - 1), W = 600, H = 90;
