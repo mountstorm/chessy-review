@@ -24,7 +24,10 @@
       <h1>Understand every move.</h1>
       <p>Free game review with Stockfish, a what-if explorer, and a coach that checks the engine before it speaks.</p>
     </div>
-    <p class="muted small" id="hostedNote" hidden style="text-align:center;max-width:720px;margin:0 auto 14px"></p>
+    <div class="hostednote" id="hostedNote" hidden>
+      <p class="muted small">Hosted demo · games aren't saved · <button type="button" class="linkbtn" id="hostedMore" aria-expanded="false" aria-controls="hostedDetails">Details</button></p>
+      <ul class="muted small" id="hostedDetails" hidden></ul>
+    </div>
     <div class="import card">
       <form id="importForm" autocomplete="off">
         <div class="seg" id="srcToggle" role="group" aria-label="Where are your games?">

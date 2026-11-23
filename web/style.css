@@ -44,6 +44,8 @@ textarea{width:100%;min-height:150px;resize:vertical;font-family:ui-monospace,Me
 .userrow input{flex:1 1 220px;padding:11px 14px;font-size:16px} .userrow select{padding:11px 12px} .userrow .btn{padding:11px 18px}
 .altrow{margin-top:12px;justify-content:space-between}
 .linkbtn{background:none;border:0;padding:4px 2px;color:var(--accent);cursor:pointer;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.hostednote{text-align:center;max-width:720px;margin:0 auto 14px}.hostednote p{margin:0;white-space:nowrap}
+.hostednote ul{text-align:left;max-width:520px;margin:8px auto 0;padding-left:20px;line-height:1.5}.hostednote li+li{margin-top:4px}.hostednote a{color:var(--accent)}
 #advanced{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
 @media (max-width:520px){.userrow .btn{flex:1 1 100%}.userrow select{flex:1 1 auto}.altrow{flex-direction:column;align-items:stretch;text-align:center}}
 .tabs{display:flex;gap:4px;margin-bottom:12px;border-bottom:1px solid var(--line)}

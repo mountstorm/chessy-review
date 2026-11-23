@@ -609,7 +609,10 @@ function init() {
     const s = $('#status'); s.classList.add('ok'); $('#statusText').textContent = h.hosted ? `${h.engine || 'Stockfish'} · hosted demo` : `${h.engine} · ${h.workers} workers · coach: ${h.coach}`;
     if (h.hosted) {
       S.hosted = true; $('[data-nav="insights"]').hidden = true; $('#hostedNote').hidden = false;
-      $('#hostedNote').textContent = `Hosted demo: games live in your browser tab and aren't saved. Analysis goes up to depth ${h.max_depth} and ${h.max_plies} moves. Run it locally for saved games, insights and a local AI coach.`;
+      $('#hostedDetails').innerHTML = `<li>Your games live in this browser tab only. Refresh or close it and they're gone.</li>` +
+        `<li>Analysis goes up to depth ${h.max_depth} and ${h.max_plies} moves, and each visitor gets a limited number of reviews per hour.</li>` +
+        `<li>Saved games, player insights and the local AI coach aren't available here. <a href="https://github.com/mountstorm/chessy-review#readme" target="_blank" rel="noopener">Run Chessy locally</a> to get them, with no limits.</li>`;
+      $('#hostedMore').onclick = () => { const open = $('#hostedDetails').hidden; $('#hostedDetails').hidden = !open; $('#hostedMore').setAttribute('aria-expanded', open); $('#hostedMore').textContent = open ? 'Hide details' : 'Details'; };
       const deep = $('#depthSel option[value="18"]'); if (deep) deep.remove();
     }
     if (h.needs_code && !getCode()) { $('#codeModal').hidden = false; }
