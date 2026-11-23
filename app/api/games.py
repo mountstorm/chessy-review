@@ -24,7 +24,7 @@ def _summary(g: Game, analyzed: bool, created: bool = True) -> GameSummary:
     tree = g.tree
     return GameSummary(id=g.id, source=g.source, white=g.white, black=g.black, white_elo=g.white_elo,
                        black_elo=g.black_elo, result=g.result, opening=g.opening, eco=g.eco,
-                       time_control=g.time_control or {}, plies=len(pgnlib.mainline_nodes(tree)),
+                       time_control=g.time_control or {}, date=(g.meta or {}).get("date"), plies=len(pgnlib.mainline_nodes(tree)),
                        variations=pgnlib.count_variations(tree), analyzed=analyzed, created=created)
 
 
@@ -64,7 +64,7 @@ async def import_games(body: ImportRequest, request: Request) -> Dict[str, Any]:
             gid = "h" + hashlib.sha1((source + pg.source_id).encode()).hexdigest()[:10]
             out_h.append({"id": gid, "source": source, "white": m["white"], "black": m["black"], "white_elo": m["white_elo"],
                           "black_elo": m["black_elo"], "result": m["result"], "opening": m["opening"], "eco": m["eco"],
-                          "time_control": m["time_control"], "plies": len(pgnlib.mainline_nodes(pg.tree)),
+                          "time_control": m["time_control"], "date": m["date"], "plies": len(pgnlib.mainline_nodes(pg.tree)),
                           "variations": pgnlib.count_variations(pg.tree), "analyzed": False, "created": True,
                           "meta": m, "pgn": pg.pgn, "tree": pg.tree, "reviews": []})
         return {"games": out_h, "hosted": True}

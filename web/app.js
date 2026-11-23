@@ -33,7 +33,7 @@ const S = {
   overlays: { best: true, threat: false, hang: true, heat: false },
   explore: null, sel: null, targets: [], legal: new Map(), posEval: new Map(),
   coachDraw: { arrows: [], hl: [] }, mode: 'explain', chat: [], tab: 'moves', mastersFor: null, busy: false,
-  hosted: false, hostedGames: {}, runSeq: 0,
+  hosted: false, hostedGames: {}, runSeq: 0, libTitle: '', me: '',      // me: the username of the last import, so cards can show games from that player's side
 };
 
 /* ---------- api ---------- */
@@ -536,13 +536,54 @@ async function loadInsights(name) {
 }
 
 /* ---------- home / library ---------- */
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+// PGN dates look like 2026.11.20, or 2026.??.?? when only part is known
+function fmtGameDate(d) {
+  const m = /^(\d{4})\.(\d{2}|\?\?)\.(\d{2}|\?\?)$/.exec(d || ''); if (!m) return '';
+  const year = +m[1], mon = MONTHS[+m[2] - 1];
+  if (!mon) return String(year);                                   // only the year is known
+  const day = m[3] === '??' ? '' : ` ${+m[3]}`;
+  return `${mon}${day}${year === new Date().getFullYear() ? '' : (day ? ', ' : ' ') + year}`;
+}
+// "Blitz · 3+2": the category follows Lichess' rule (base + 40 × increment, in seconds)
+function fmtTimeControl(tc) {
+  if (!tc || !tc.raw) return '';
+  if (tc.base == null) return /^1\//.test(tc.raw) ? 'Daily' : tc.raw;
+  const inc = tc.increment || 0, est = tc.base + 40 * inc;
+  const kind = est < 180 ? 'Bullet' : est < 480 ? 'Blitz' : est < 1500 ? 'Rapid' : 'Classical';
+  const t = tc.base >= 60 ? `${+(tc.base / 60).toFixed(1)}` : `${tc.base}s`;
+  return `${kind} · ${inc ? `${t}+${inc}` : tc.base >= 60 ? `${t} min` : t}`;
+}
+// Which side the imported player was on (null for pasted games or other players), and how it ended for them
+function mySide(g) { const me = S.me.toLowerCase(); return !me ? null : g.white.toLowerCase() === me ? 'white' : g.black.toLowerCase() === me ? 'black' : null; }
+function gameOutcome(g, side) {
+  const r = g.result;
+  if (r === '1/2-1/2') return ['draw', 'Draw'];
+  if (r !== '1-0' && r !== '0-1') return ['', r === '*' ? 'Unfinished' : r];
+  if (!side) return ['', r];
+  return (r === '1-0') === (side === 'white') ? ['won', 'Won'] : ['lost', 'Lost'];
+}
+function gameCard(g) {
+  const side = mySide(g), opp = side === 'white' ? 'black' : 'white', [oc, ot] = gameOutcome(g, side);
+  const elo = p => g[p + '_elo'] ? `<span class="elo">${g[p + '_elo']}</span>` : '';
+  const who = side ? `<i class="sw ${side}" title="You played ${side}"></i><span class="gc-vs">vs</span><b>${esc(g[opp])}</b>${elo(opp)}`
+                   : `<b>${esc(g.white)}</b>${elo('white')}<span class="gc-vs">vs</span><b>${esc(g.black)}</b>${elo('black')}`;
+  const bits = [fmtTimeControl(g.time_control), fmtGameDate(g.date || (g.meta && g.meta.date)), `${Math.ceil(g.plies / 2)} moves`].filter(Boolean);
+  return `<button class="gcard" data-id="${g.id}"><span class="gc-top"><span class="gc-who">${who}</span><span class="gc-res ${oc}">${esc(ot)}</span></span>` +
+    `<span class="gc-open">${esc(g.opening || 'Opening not recorded')}</span>` +
+    `<span class="gc-meta">${bits.map(esc).join(' · ')}${g.analyzed ? ' · <span class="gc-done">analyzed</span>' : ''}</span></button>`;
+}
 async function loadLibrary() {
   if (!S.hosted) { try { S.games = (await api('/api/games')).games; } catch (e) { if (e.message !== 'Access code required') S.games = []; } }
   $('#libraryCard').hidden = !S.games.length;
-  $('#library').innerHTML = S.games.map(g => `<button class="gitem" data-id="${g.id}"><span><b>${esc(g.white)}</b> vs <b>${esc(g.black)}</b></span><span class="tag pill ${g.analyzed ? 'good' : ''}">${g.analyzed ? 'analyzed' : 'new'}</span><span class="meta">${g.plies} plies · ${esc(g.result)}${g.opening ? ' · ' + esc(g.opening) : ''} · ${esc(g.source)}</span></button>`).join('');
-  $$('#library .gitem').forEach(b => b.onclick = () => openGame(b.dataset.id, true).catch(e => toast(e.message)));
+  $('#libraryTitle').textContent = S.libTitle || 'Your games';
+  $('#library').innerHTML = S.games.map(gameCard).join('');
+  $$('#library .gcard').forEach(b => b.onclick = () => openGame(b.dataset.id, true).catch(e => toast(e.message)));
 }
 async function doImport(body, btn) {
+  const who = (body.chesscom_username || body.lichess_username || '').trim();
+  if (who) S.me = who;                    // so cards show the games from that player's side
+  S.libTitle = who ? `Recent games for ${who}` : 'Your games';
   const msg = $('#importMsg'); msg.className = 'msg'; msg.textContent = ''; btn.disabled = true;
   const label = btn.textContent; if (btn.dataset.busy) btn.textContent = btn.dataset.busy;
   try {

@@ -120,13 +120,23 @@ def _int(v: Optional[str]) -> Optional[int]:
         return None
 
 
+def _game_date(h: Dict[str, str]) -> Optional[str]:
+    """The UTC date if the site gives one, else the PGN date. Unknown dates come through as '????.??.??' (python-chess fills
+    that in when there is no Date header), which carries no information, so they become None; partial ones like '2026.??.??' stay."""
+    for key in ("UTCDate", "Date"):
+        v = h.get(key)
+        if v and any(c.isdigit() for c in v):
+            return v
+    return None
+
+
 def extract_meta(h: Dict[str, str]) -> Dict[str, Any]:
     return {
         "white": h.get("White", "?"), "black": h.get("Black", "?"),
         "white_elo": _int(h.get("WhiteElo")), "black_elo": _int(h.get("BlackElo")),
         "result": h.get("Result", "*"), "eco": h.get("ECO"), "opening": _opening_from_headers(h),
         "time_control": _time_control(h), "event": h.get("Event"), "site": h.get("Site"),
-        "date": h.get("UTCDate") or h.get("Date"), "termination": h.get("Termination"),
+        "date": _game_date(h), "termination": h.get("Termination"),
     }
 
 

@@ -31,6 +31,7 @@ class GameSummary(BaseModel):
     opening: Optional[str] = None
     eco: Optional[str] = None
     time_control: Dict[str, Any] = {}
+    date: Optional[str] = None            # PGN date, e.g. 2026.11.20 (UTC date when the site gives one)
     plies: int
     variations: int = 0
     analyzed: bool = False
