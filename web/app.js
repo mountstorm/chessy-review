@@ -247,15 +247,17 @@ function renderGraph() {
   const pts = []; for (let i = 0; i <= n; i++) { const e = S.evals[i]; if (e) pts.push([i / n * W, H * (1 - e.win)]); }
   const known = pts.length ? pts[pts.length - 1][0] : 0;
   // Black's side is dark, White's is light, and the boundary between them is the evaluation (up = Black is better, down = White).
-  let svg = `<rect width="${W}" height="${H}" fill="#1e222d"/>`;
-  if (pts.length > 1) svg += `<polygon points="0,${H} ${pts.map(p => p.join(',')).join(' ')} ${known},${H}" fill="#f4f5f8"/>`;
-  if (known < W - 1) svg += `<rect x="${known}" width="${W - known}" height="${H}" fill="#7d88aa" opacity=".45"/>`;      // not analyzed yet: neither side
-  svg += `<line x1="0" y1="${H / 2}" x2="${W}" y2="${H / 2}" stroke="#7d88aa" stroke-width="1.5"/>`;                   // equal position
+  // Colours come from CSS (--g-*), so the graph follows the theme without a re-render.
+  let svg = `<rect class="g-black" width="${W}" height="${H}"/>`;
+  if (pts.length > 1) svg += `<polygon class="g-white" points="0,${H} ${pts.map(p => p.join(',')).join(' ')} ${known},${H}"/>`;
+  if (known < W - 1) svg += `<rect class="g-pending" x="${known}" width="${W - known}" height="${H}"/>`;      // not analyzed yet: neither side
+  // Equal position: a dark casing under a light core, so the line shows on the light side and on the dark side alike.
+  svg += `<line class="g-mid-casing" x1="0" y1="${H / 2}" x2="${W}" y2="${H / 2}"/><line class="g-mid" x1="0" y1="${H / 2}" x2="${W}" y2="${H / 2}"/>`;
   S.moves.forEach(m => {
     const r = GRAPH_DOTS[m.label], e = S.evals[m.ply]; if (!r || !e) return;
     const x = m.ply / n * W, y = Math.min(H - 7, Math.max(7, H * (1 - e.win)));
     svg += `<g><title>${Math.ceil(m.ply / 2)}${m.ply % 2 ? '.' : '...'} ${esc(m.san)} · ${LABELS[m.label][1]}</title>` +
-      `<circle cx="${x}" cy="${y}" r="${r + 1.5}" fill="none" stroke="#1e222d" stroke-width="1"/>` +             // dark rim shows on the light side...
+      `<circle class="g-rim" cx="${x}" cy="${y}" r="${r + 1.5}" fill="none" stroke-width="1"/>` +             // dark rim shows on the light side...
       `<circle cx="${x}" cy="${y}" r="${r}" fill="${BADGE_COLOR[m.label]}" stroke="#fff" stroke-width="1.5"/></g>`;   // ...white rim on the dark side
   });
   svg += `<line x1="${S.ply / n * W}" y1="0" x2="${S.ply / n * W}" y2="${H}" stroke="#4f6df5" stroke-width="2"/>`;
