@@ -63,9 +63,23 @@ def test_at_most_three_moments_taking_the_biggest_ones_in_key_moment_order():
 
 
 def test_a_clean_game_has_no_moments_and_the_threshold_is_inclusive():
-    assert build_moments([mv(3, loss=0.14)], [3]) == []
     assert [m["ply"] for m in build_moments([mv(3, loss=MOMENT_MIN_LOSS)], [3])] == [3]
-    assert build_moments([], []) == []
+    assert "minor" not in build_moments([mv(3, loss=MOMENT_MIN_LOSS)], [3])[0]       # a real turning point isn't flagged
+    assert build_moments([], []) == [] and build_moments([mv(3, loss=0.5)], []) == []
+
+
+def test_when_nothing_is_a_turning_point_the_biggest_slips_stand_in_flagged_minor():
+    moves = [mv(p, label="inaccuracy", loss=l) for p, l in [(4, .05), (9, .14), (12, .08), (20, .03), (30, .1)]]
+    got = build_moments(moves, [9, 30, 12, 4, 20])                             # biggest first, like the review's key moments
+    assert [m["ply"] for m in got] == [9, 12, 30] and all(m["minor"] for m in got)     # top 3, back in game order
+    assert all(m["sentence"] for m in got)
+
+
+def test_moments_are_empty_only_when_key_moments_are():
+    for losses in ([], [.02], [.14], [.5], [.02, .6]):
+        moves = [mv(i + 1, loss=l) for i, l in enumerate(losses)]
+        keys = [m["ply"] for m in sorted(moves, key=lambda m: -m["loss"])]
+        assert bool(with_moments({"key_moments": keys}, moves)["moments"]) == bool(keys)
 
 
 def test_key_moments_that_are_not_in_the_move_list_are_skipped():
@@ -80,6 +94,14 @@ def test_with_moments_fills_in_reviews_saved_before_this_existed_and_leaves_new_
     already = {"key_moments": [26], "moments": [{"ply": 1, "sentence": "kept"}]}
     assert with_moments(already, [mv(26)]) is already
     assert with_moments({}, [mv(26)])["moments"] == []                                      # no key_moments at all
+
+
+def test_with_moments_repairs_a_saved_empty_list_that_contradicts_the_key_moments():
+    saved = {"key_moments": [26], "moments": []}
+    fixed = with_moments(saved, [mv(26, loss=0.04, label="inaccuracy")])
+    assert [m["ply"] for m in fixed["moments"]] == [26] and fixed["moments"][0]["minor"] and saved["moments"] == []
+    clean = {"key_moments": [], "moments": []}
+    assert with_moments(clean, []) is clean
 
 
 # ---------------------------------------------------------------- end to end (hosted analysis streams the summary)

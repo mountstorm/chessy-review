@@ -281,7 +281,8 @@ function renderMoveCard() {
 function renderMoments() {
   const el = $('#momentsBox'), list = S.summary && S.summary.moments;
   if (!list) { el.innerHTML = ''; return; }
-  if (!list.length) { el.innerHTML = '<div class="card"><h3>Moments that decided this game</h3><p class="muted small" style="margin:8px 0 0">No big turning points: neither player gave away much in a single move.</p></div>'; return; }
+  const minor = list.length > 0 && list.every(x => x.minor), title = minor ? 'Biggest slips in this game' : 'Moments that decided this game';
+  if (!list.length) { el.innerHTML = '<div class="card"><h3>Moments that decided this game</h3><p class="muted small" style="margin:8px 0 0">No mistakes were found in this game.</p></div>'; return; }
   const me = S.me.toLowerCase();
   const cards = list.map(({ ply, sentence }) => {
     const m = S.moves[ply - 1]; if (!m) return '';
@@ -292,7 +293,7 @@ function renderMoments() {
       `<span class="mwho"><i class="sw ${m.mover}"></i>${esc(who)}</span><span class="ms">${esc(sentence)}</span>` +
       `<span class="mlg"><span><i style="background:${ARROW.blue}"></i>Played ${esc(m.san)}</span>${m.best ? `<span><i style="background:${ARROW.green}"></i>Better ${esc(m.best.san)}</span>` : ''}</span></span></button>`;
   }).join('');
-  el.innerHTML = `<div class="card"><h3>Moments that decided this game</h3><div class="moments">${cards}</div></div>`;
+  el.innerHTML = `<div class="card"><h3>${title}</h3><div class="moments">${cards}</div></div>`;
   $$('#momentsBox [data-ply]').forEach(b => b.onclick = () => goTo(+b.dataset.ply));
 }
 function renderSummary() {

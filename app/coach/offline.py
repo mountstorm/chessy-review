@@ -45,16 +45,24 @@ def moment_sentence(move: Dict[str, Any]) -> str:
 
 def build_moments(moves: List[Dict[str, Any]], key_moments: List[int]) -> List[Dict[str, Any]]:
     """The turning points of a game: from the review's key moments (its biggest losses), keep the ones that really cost
-    something, at most MOMENT_LIMIT, and put them in game order so they read as the story of the game."""
+    something, at most MOMENT_LIMIT, and put them in game order so they read as the story of the game.
+
+    When none is big enough, fall back to the biggest slips among the key moments, flagged "minor", so this list is never
+    empty while the review's own key moments list isn't (the two would contradict each other)."""
     by_ply = {m["ply"]: m for m in moves}
-    picked = [by_ply[p] for p in key_moments if p in by_ply and by_ply[p]["loss"] >= MOMENT_MIN_LOSS][:MOMENT_LIMIT]
-    return [{"ply": m["ply"], "sentence": moment_sentence(m)} for m in sorted(picked, key=lambda m: m["ply"])]
+    known = [by_ply[p] for p in key_moments if p in by_ply]
+    picked = [m for m in known if m["loss"] >= MOMENT_MIN_LOSS][:MOMENT_LIMIT]
+    minor = not picked
+    if minor:
+        picked = known[:MOMENT_LIMIT]
+    return [{"ply": m["ply"], "sentence": moment_sentence(m), **({"minor": True} if minor else {})}
+            for m in sorted(picked, key=lambda m: m["ply"])]
 
 
 def with_moments(summary: Dict[str, Any], moves: List[Dict[str, Any]]) -> Dict[str, Any]:
     """The summary plus its turning points. Reviews saved before this existed don't have them, so fill them in on the way out."""
-    if "moments" in summary:
-        return summary
+    if summary.get("moments") or (not summary.get("key_moments") and "moments" in summary):
+        return summary                  # an empty list saved next to key moments is repaired below
     return {**summary, "moments": build_moments(moves, summary.get("key_moments") or [])}
 
 
