@@ -54,6 +54,12 @@
       </div>
       <p class="msg" id="importMsg" role="alert"></p>
     </div>
+    <!-- Static preview of a finished review. The images are screenshots of the real app on samples/preview_game.pgn (depth 14,
+         Review tab, move 19. Qxf7+), one per theme and one per screen size (phones get a crop of the phone layout), chosen in CSS so a visitor downloads only the one they see; regenerate them whenever the review screen changes noticeably. -->
+    <figure class="preview card">
+      <div class="pv" role="img" aria-label="A finished game review: the board with the blunder 19. Qxf7+ marked and the better move Qf5 drawn as an arrow, an evaluation graph of the whole game, the moments that decided it with a plain-English explanation of each, and every move graded."></div>
+      <figcaption class="muted small">A finished review: every move graded, the engine's better move shown, and the moments that decided the game.</figcaption>
+    </figure>
     <div class="card" id="libraryCard" hidden>
       <h2 id="libraryTitle">Your games</h2>
       <div id="library" class="library"></div>

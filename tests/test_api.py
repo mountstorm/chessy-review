@@ -143,3 +143,9 @@ async def test_lichess_importer_and_username_validation():
     with pytest.raises(importers.ImportFailed) as e:
         await importers.fetch_lichess("bad name!!", 3)
     assert e.value.status == 422
+
+
+def test_the_home_preview_images_are_served_as_webp(client):
+    for name in ("preview-dark.webp", "preview-light.webp"):
+        r = client.get(f"/assets/{name}")
+        assert r.status_code == 200 and r.headers["content-type"] == "image/webp" and r.content[8:12] == b"WEBP"

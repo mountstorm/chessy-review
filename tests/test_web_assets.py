@@ -17,7 +17,7 @@ def test_status_has_an_accessible_name_the_dot_alone_can_carry():
 
 def test_small_screens_hide_the_status_text_visually_but_keep_it_in_the_page():
     css = read("style.css")
-    block = re.search(r"@media \(max-width:479px\)\{(.*?)\n\}", css, re.S).group(1)
+    block = next(b for b in re.findall(r"@media \(max-width:479px\)\{(.*?)\n\}", css, re.S) if "#statusText" in b)
     rule = re.search(r"#statusText\{([^}]*)\}", block).group(1)
     assert "clip" in rule and "position:absolute" in rule and "display:none" not in rule
     assert not re.search(r"#statusText\{[^}]*ellipsis", css)                 # the old truncation hack is gone
@@ -78,3 +78,38 @@ def test_graph_colours_come_from_css_not_hardcoded_in_the_drawing_code():
     body = re.search(r"function renderGraph\(\).*?\n\}", js, re.S).group(0)
     assert not re.search(r'#(?:f4f5f8|1e222d|7d88aa)', body, re.I)
     assert all(c in body for c in ("g-white", "g-black", "g-mid-casing", "g-rim"))
+
+
+# ---------------------------------------------------------------- the home page preview of a finished review
+def test_home_preview_follows_the_import_form_and_is_described_for_screen_readers():
+    html = read("index.html")
+    assert html.index('class="import card"') < html.index('class="preview') < html.index('id="libraryCard"')
+    tag = re.search(r'<div class="pv"[^>]*>', html).group(0)
+    assert 'role="img"' in tag and re.search(r'aria-label="[^"]{30,}"', tag)
+
+
+def preview_files():
+    """(dark, light, mobile dark, mobile light), as named by the CSS rules that choose between them."""
+    css = read("style.css")
+    dark = re.search(r"\.preview \.pv\{[^}]*url\(/assets/([^)]+)\)", css).group(1)
+    light = re.search(r"data-theme=light\] \.preview \.pv\{background-image:url\(/assets/([^)]+)\)", css).group(1)
+    phone = re.search(r"@media \(max-width:479px\)\{[^@]*?\.preview \.pv\{[^}]*url\(/assets/([^)]+)\)[^@]*?data-theme=light\] \.preview \.pv\{background-image:url\(/assets/([^)]+)\)", css, re.S)
+    return dark, light, phone.group(1), phone.group(2)
+
+
+def test_each_theme_and_screen_size_gets_its_own_image_through_one_css_rule_so_only_one_is_downloaded():
+    files = preview_files()
+    assert len(set(files)) == 4
+    css = read("style.css")
+    assert "aspect-ratio:1128/940" in css and "aspect-ratio:780/1560" in css      # reserves the space: no layout shift
+    assert "<img" not in re.search(r'<figure class="preview.*?</figure>', read("index.html"), re.S).group(0)   # an <img> would fetch both
+
+
+def test_preview_images_are_real_small_webp_files_that_git_will_keep():
+    import subprocess
+    for name in preview_files():
+        data = (WEB / name).read_bytes()
+        assert data[:4] == b"RIFF" and data[8:12] == b"WEBP" and len(data) <= 150_000
+        # .gitignore and .vercelignore both drop *.png, which is why these are WebP
+        assert subprocess.run(["git", "check-ignore", "-q", str(WEB / name)], cwd=WEB).returncode == 1
+        assert not any(l.strip().startswith("*.webp") for l in (WEB.parent / ".vercelignore").read_text().splitlines())
