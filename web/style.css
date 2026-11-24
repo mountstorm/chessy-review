@@ -90,7 +90,12 @@ textarea{width:100%;min-height:150px;resize:vertical;font-family:ui-monospace,Me
 .chips .pill b{color:var(--text)}
 .graph{width:calc(100% - 38px);margin:12px 0 0 38px;height:90px;background:var(--panel);border:1px solid var(--line);border-radius:10px;cursor:pointer;display:block}
 @media (max-width:520px){.top{gap:10px}.status{font-size:12px;line-height:1.3}}
-@media (max-width:374px){.navbtn{padding:8px 8px}.status{min-width:0;flex:1 1 0;justify-content:flex-end}#statusText{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}      /* room for the theme button without making the header taller */
+@media (max-width:374px){.navbtn{padding:8px 8px}}      /* room for the theme button without making the header taller */
+/* Phones: the status is just its dot (the text stays in the DOM, visually hidden; #status carries it as aria-label and title). */
+@media (max-width:479px){
+  #statusText{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+  .status{gap:0}.dot{width:12px;height:12px}
+}
 /* Phones: the board takes the whole screen width. The evaluation bar moves from beside the board to a thin strip above it, and the
    38px indent that lined everything up beside the vertical bar goes away. */
 @media (max-width:520px){

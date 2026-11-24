@@ -277,6 +277,11 @@ function renderMoveCard() {
   el.innerHTML = `<div class="movecard">${html}</div>`;
   const tb = $('#tryBest'); if (tb) tb.onclick = () => { S.explore = null; startExplore(S.fens[S.ply - 1], [m.best.uci]); setTab('lines'); };
 }
+// The header's backend status. Under 480px only the dot is visible, so the text is also the dot's accessible name and tooltip.
+function setStatus(kind, text) {
+  const s = $('#status'); s.classList.add(kind); $('#statusText').textContent = text;
+  s.title = text; s.setAttribute('aria-label', 'Backend status: ' + text);
+}
 // The turning points of the game: server-picked plies and one-sentence explanations, drawn on mini boards of the position before the move
 function renderMoments() {
   const el = $('#momentsBox'), list = S.summary && S.summary.moments;
@@ -699,8 +704,7 @@ function init() {
   });
   $('#codeForm').onsubmit = e => { e.preventDefault(); try { localStorage.setItem('chessy.code', $('#codeInput').value.trim()); } catch { /* private mode */ } $('#codeModal').hidden = true; toast('Code saved. Try again.'); };
   api('/api/health').then(h => {
-    const s = $('#status'); s.classList.add('ok'); $('#statusText').textContent = h.hosted ? `${h.engine || 'Stockfish'} · hosted demo` : `${h.engine} · ${h.workers} workers · coach: ${h.coach}`;
-    s.title = $('#statusText').textContent;      // the full text, for when the header has to truncate it
+    setStatus('ok', h.hosted ? `${h.engine || 'Stockfish'} · hosted demo` : `${h.engine} · ${h.workers} workers · coach: ${h.coach}`);
     if (h.hosted) {
       S.hosted = true; $('[data-nav="insights"]').hidden = true; $('#hostedNote').hidden = false;
       $('#hostedDetails').innerHTML = `<li>Your games live in this browser tab only. Refresh or close it and they're gone.</li>` +
@@ -711,7 +715,7 @@ function init() {
     }
     if (h.needs_code && !getCode()) { $('#codeModal').hidden = false; }
   })
-    .catch(() => { $('#status').classList.add('err'); $('#statusText').textContent = 'backend offline'; })
+    .catch(() => setStatus('err', 'backend offline'))
     .finally(() => show('home'));      // after the health check, so hosted mode skips the database-backed library
 }
 init();
