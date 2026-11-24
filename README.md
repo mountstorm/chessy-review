@@ -78,9 +78,14 @@ npx vercel deploy --prod               # uploads the app + binary from disk
 Hosted limits (env-tunable): `HOSTED_MAX_DEPTH=14`, `HOSTED_MAX_PLIES=200`, `HOSTED_POOL_SIZE=2`.
 Rate limits per visitor IP (HTTP 429 with a clear message and `Retry-After`; `0` disables a limit):
 `HOSTED_RATE_ANALYZE=10`, `HOSTED_RATE_EVALUATE=120`, `HOSTED_RATE_COACH=30` requests per `HOSTED_RATE_WINDOW=3600` seconds.
-Visitors who send a valid access code are exempt. The counters live in memory, so on a serverless platform they are
-per instance and best-effort: a visitor spread across instances (or a cold start) can get a few extra requests. The
-client address is the last `X-Forwarded-For` entry, which Vercel sets; behind a proxy that doesn't, every visitor
+Visitors who send a valid access code are exempt. By default the counters live in memory, so on a serverless platform
+they are per instance and best-effort: a visitor spread across instances (or a cold start) can get a few extra
+requests. For shared counts, create an [Upstash Redis](https://upstash.com) database (the Vercel integration sets these
+for you) and set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`; every instance then counts in one place. The
+shared counter is a fixed window (one atomic `INCR` per request), so a visitor can briefly get up to twice the limit
+across a window boundary, and only a hash of the visitor's address is stored. If Upstash can't be reached the request
+is still served and limited in memory until it is back (one warning in the logs). The Upstash path is unit-tested
+against a mocked REST API but has **not been run against a live database**. The client address is the last `X-Forwarded-For` entry, which Vercel sets; behind a proxy that doesn't, every visitor
 would share one bucket. Saved games, insights
 and the local AI coach are local-only. To restrict who can use a public deployment, set `CHESSY_ACCESS_CODE` in the
 Vercel project's environment variables; the UI then asks visitors for the code.

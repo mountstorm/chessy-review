@@ -58,6 +58,9 @@ class Settings(BaseSettings):
     hosted_rate_evaluate: int = 120
     hosted_rate_coach: int = 30
     hosted_rate_window: int = 3600      # seconds
+    # shared rate-limit counters (Upstash Redis REST); unset = per-instance in-memory counts
+    upstash_redis_rest_url: Optional[str] = None
+    upstash_redis_rest_token: Optional[str] = None
 
     def resolved_stockfish(self) -> str:
         path = self.stockfish_path or os.environ.get("STOCKFISH") or shutil.which("stockfish") or _vendored_stockfish()

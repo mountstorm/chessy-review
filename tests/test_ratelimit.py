@@ -1,6 +1,10 @@
 """Per-IP rate limiting in hosted mode."""
 import asyncio
+import json
+import logging
 from types import SimpleNamespace
+
+import httpx
 
 import pytest
 from fastapi.testclient import TestClient
@@ -8,7 +12,7 @@ from fastapi.testclient import TestClient
 from app import ratelimit
 from app.config import get_settings
 from app.main import create_app
-from app.ratelimit import RateLimiter, client_ip, rate_limit
+from app.ratelimit import RateLimiter, SharedRateLimiter, StoreError, UpstashStore, client_ip, make_limiter, rate_limit
 from conftest import needs_engine
 
 SCHOLAR = "1. e4 e5 2. Qh5 Nc6 3. Bc4 Nf6 4. Qxf7# 1-0"
@@ -22,30 +26,34 @@ class Clock:
         return self.t
 
 
+def hit(rl, *a):
+    return asyncio.run(rl.hit(*a))
+
+
 # ---------------------------------------------------------------- the limiter itself
 def test_allows_up_to_the_limit_then_blocks_with_a_retry_time():
     clock = Clock()
     rl = RateLimiter(clock)
-    assert [rl.hit("analyze", "1.2.3.4", 3, 3600) for _ in range(3)] == [None, None, None]
+    assert [hit(rl, "analyze", "1.2.3.4", 3, 3600) for _ in range(3)] == [None, None, None]
     clock.t += 600
-    assert rl.hit("analyze", "1.2.3.4", 3, 3600) == 3000          # oldest hit frees up 3000s from now
+    assert hit(rl, "analyze", "1.2.3.4", 3, 3600) == 3000          # oldest hit frees up 3000s from now
 
 
 def test_window_slides_so_old_hits_stop_counting():
     clock = Clock()
     rl = RateLimiter(clock)
     for _ in range(2):
-        rl.hit("analyze", "ip", 2, 3600)
-    assert rl.hit("analyze", "ip", 2, 3600) is not None
+        hit(rl, "analyze", "ip", 2, 3600)
+    assert hit(rl, "analyze", "ip", 2, 3600) is not None
     clock.t += 3600
-    assert rl.hit("analyze", "ip", 2, 3600) is None
+    assert hit(rl, "analyze", "ip", 2, 3600) is None
 
 
 def test_ips_and_groups_are_counted_separately():
     rl = RateLimiter(Clock())
-    assert rl.hit("analyze", "a", 1, 3600) is None and rl.hit("analyze", "a", 1, 3600) is not None
-    assert rl.hit("analyze", "b", 1, 3600) is None                 # another visitor
-    assert rl.hit("evaluate", "a", 1, 3600) is None                # another endpoint group, same visitor
+    assert hit(rl, "analyze", "a", 1, 3600) is None and hit(rl, "analyze", "a", 1, 3600) is not None
+    assert hit(rl, "analyze", "b", 1, 3600) is None                 # another visitor
+    assert hit(rl, "evaluate", "a", 1, 3600) is None                # another endpoint group, same visitor
 
 
 def test_memory_is_bounded(monkeypatch):
@@ -53,9 +61,9 @@ def test_memory_is_bounded(monkeypatch):
     clock = Clock()
     rl = RateLimiter(clock)
     for i in range(5):
-        rl.hit("analyze", f"ip{i}", 1, 60)
+        hit(rl, "analyze", f"ip{i}", 1, 60)
     clock.t += 61                                                  # all five have expired
-    rl.hit("analyze", "new", 1, 60)
+    hit(rl, "analyze", "new", 1, 60)
     assert len(rl._hits) == 1
 
 
@@ -156,3 +164,133 @@ def test_a_real_evaluate_is_rate_limited_after_the_budget(monkeypatch):
     with _client(monkeypatch, HOSTED_RATE_EVALUATE="2") as c:
         codes = [c.post("/api/positions/evaluate", json=body, headers={"x-forwarded-for": "4.4.4.4"}).status_code for _ in range(3)]
     assert codes == [200, 200, 429]
+
+
+# ---------------------------------------------------------------- shared counts (Upstash Redis)
+class FakeStore:
+    """What UpstashStore does server side: a fixed-window counter per key, on a clock we control."""
+    def __init__(self, clock):
+        self.clock, self.data, self.calls, self.fail = clock, {}, [], False
+
+    async def incr(self, key, window):
+        self.calls.append(key)
+        if self.fail:
+            raise StoreError("ConnectError")
+        n, expires = self.data.get(key, (0, 0))
+        if expires <= self.clock():
+            n, expires = 0, self.clock() + window
+        self.data[key] = (n + 1, expires)
+        return n + 1, int(expires - self.clock())
+
+
+def test_two_instances_sharing_a_store_share_one_budget():
+    store = FakeStore(Clock())
+    a, b = SharedRateLimiter(store), SharedRateLimiter(store)          # two serverless instances
+    assert [hit(a, "analyze", "1.1.1.1", 3, 3600) for _ in range(3)] == [None] * 3
+    assert hit(b, "analyze", "1.1.1.1", 3, 3600) == 3600                # B knows about A's hits
+    assert hit(b, "analyze", "2.2.2.2", 3, 3600) is None                # another visitor is untouched
+
+
+def test_in_memory_limiters_do_not_share_which_is_the_gap_this_closes():
+    a, b = RateLimiter(Clock()), RateLimiter(Clock())
+    assert [hit(a, "analyze", "ip", 1, 3600), hit(b, "analyze", "ip", 1, 3600)] == [None, None]
+
+
+def test_shared_window_expires_and_retry_after_is_the_time_left():
+    clock = Clock()
+    rl = SharedRateLimiter(FakeStore(clock))
+    hit(rl, "analyze", "ip", 1, 3600)
+    clock.t += 600
+    assert hit(rl, "analyze", "ip", 1, 3600) == 3000
+    clock.t += 3000
+    assert hit(rl, "analyze", "ip", 1, 3600) is None
+
+
+def test_groups_are_counted_separately_in_the_shared_store():
+    rl = SharedRateLimiter(FakeStore(Clock()))
+    assert hit(rl, "analyze", "a", 1, 60) is None and hit(rl, "analyze", "a", 1, 60) is not None
+    assert hit(rl, "evaluate", "a", 1, 60) is None
+
+
+def test_the_store_never_sees_a_raw_ip():
+    store = FakeStore(Clock())
+    hit(SharedRateLimiter(store), "coach", "203.0.113.7", 5, 60)
+    assert store.calls and all("203.0.113.7" not in k and k.startswith("chessy:rl:coach:") for k in store.calls)
+
+
+def test_a_store_outage_falls_back_to_memory_still_limits_and_warns_once(caplog):
+    store = FakeStore(Clock())
+    rl = SharedRateLimiter(store, RateLimiter(Clock()))
+    store.fail = True
+    with caplog.at_level(logging.INFO, logger="chessy.ratelimit"):
+        assert hit(rl, "analyze", "ip", 1, 3600) is None                 # allowed, not a 500
+        assert hit(rl, "analyze", "ip", 1, 3600) is not None             # and still limited, per instance
+        assert sum("unavailable" in r.message for r in caplog.records) == 1
+        store.fail = False
+        assert hit(rl, "analyze", "ip", 1, 3600) is None                 # back on the shared count
+        assert any("back" in r.message for r in caplog.records)
+
+
+def _upstash(handler):
+    return UpstashStore("https://eu1-x.upstash.io/", "tok3n", transport=httpx.MockTransport(handler))
+
+
+def test_upstash_store_sends_one_authenticated_pipeline_and_reads_count_and_ttl():
+    seen = []
+
+    def handler(req):
+        seen.append(req)
+        return httpx.Response(200, json=[{"result": 4}, {"result": 0}, {"result": 3500}])
+    assert asyncio.run(_upstash(handler).incr("chessy:rl:analyze:abc", 3600)) == (4, 3500)
+    (req,) = seen
+    assert str(req.url) == "https://eu1-x.upstash.io/pipeline" and req.headers["authorization"] == "Bearer tok3n"
+    assert json.loads(req.content) == [["INCR", "chessy:rl:analyze:abc"], ["EXPIRE", "chessy:rl:analyze:abc", 3600, "NX"],
+                                       ["TTL", "chessy:rl:analyze:abc"]]
+
+
+def test_upstash_store_without_a_ttl_reports_the_whole_window():
+    store = _upstash(lambda r: httpx.Response(200, json=[{"result": 1}, {"result": 0}, {"result": -1}]))
+    assert asyncio.run(store.incr("k", 60)) == (1, 60)
+
+
+def _raise_timeout(r):
+    raise httpx.ConnectTimeout("slow")
+
+
+@pytest.mark.parametrize("handler", [
+    lambda r: httpx.Response(500, text="boom"),
+    lambda r: httpx.Response(401, json={"error": "WRONGPASS tok3n"}),
+    lambda r: httpx.Response(200, text="<html>"),
+    lambda r: httpx.Response(200, json=[{"error": "ERR"}, {"result": 0}, {"result": 1}]),
+    lambda r: httpx.Response(200, json={"result": 1}),
+    _raise_timeout,
+], ids=["500", "401", "not-json", "command-error", "wrong-shape", "timeout"])
+def test_upstash_failures_become_store_errors_without_leaking_the_token(handler):
+    with pytest.raises(StoreError) as e:
+        asyncio.run(_upstash(handler).incr("k", 60))
+    assert "tok3n" not in str(e.value)
+
+
+def test_make_limiter_uses_upstash_only_when_both_settings_are_present():
+    def pick(url, token):
+        return make_limiter(SimpleNamespace(upstash_redis_rest_url=url, upstash_redis_rest_token=token))
+    assert isinstance(pick("https://x", "t"), SharedRateLimiter)
+    assert all(isinstance(pick(u, t), RateLimiter) for u, t in [(None, None), ("https://x", None), (None, "t"), ("", "")])
+
+
+def test_the_app_shares_counts_through_the_configured_store(monkeypatch):
+    with _client(monkeypatch, HOSTED_RATE_ANALYZE="1", UPSTASH_REDIS_REST_URL="https://x.upstash.io",
+                 UPSTASH_REDIS_REST_TOKEN="t") as c:
+        assert isinstance(c.app.state.limiter, SharedRateLimiter)
+        store = FakeStore(Clock())
+        c.app.state.limiter = SharedRateLimiter(store)
+        assert _analyze(c).status_code != 429 and _analyze(c).status_code == 429
+        c.app.state.limiter = SharedRateLimiter(store)                  # a "new instance" with empty memory
+        assert _analyze(c).status_code == 429
+
+
+def test_the_app_uses_memory_counts_when_no_store_is_configured(monkeypatch):
+    monkeypatch.delenv("UPSTASH_REDIS_REST_URL", raising=False)
+    monkeypatch.delenv("UPSTASH_REDIS_REST_TOKEN", raising=False)
+    with _client(monkeypatch) as c:
+        assert isinstance(c.app.state.limiter, RateLimiter)
