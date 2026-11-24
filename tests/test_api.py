@@ -149,3 +149,17 @@ def test_the_home_preview_images_are_served_as_webp(client):
     for name in ("preview-dark.webp", "preview-light.webp"):
         r = client.get(f"/assets/{name}")
         assert r.status_code == 200 and r.headers["content-type"] == "image/webp" and r.content[8:12] == b"WEBP"
+
+
+def test_webp_content_type_does_not_depend_on_the_operating_systems_mime_database(monkeypatch):
+    """Vercel's Python image has no .webp mapping, so the preview images were served as application/octet-stream."""
+    import importlib
+    import mimetypes
+
+    import app.main
+    mimetypes.init()
+    for table in (mimetypes.types_map, *mimetypes._db.types_map):          # the module-level map and the (loose, strict) pair
+        monkeypatch.delitem(table, ".webp", raising=False)                  # as if the OS didn't know it
+    assert mimetypes.guess_type("x.webp")[0] is None                        # the premise: without the fix it is unknown
+    importlib.reload(app.main)
+    assert mimetypes.guess_type("x.webp")[0] == "image/webp"

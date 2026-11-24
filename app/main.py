@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hmac
 import logging
+import mimetypes
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -21,6 +22,8 @@ from .models.db import make_sessionmaker
 from .ratelimit import make_limiter
 
 log = logging.getLogger("chessy")
+# Python takes content types from the OS; serverless images lack .webp, which then went out as application/octet-stream.
+mimetypes.add_type("image/webp", ".webp")
 WEB = Path(__file__).resolve().parent.parent / "web"
 
 
