@@ -61,8 +61,13 @@ class PositionEval:
         return cls(d["fen"], d["depth"], d["multipv"], [Line(**l) for l in d["lines"]], d["terminal"], d["cp_white"])
 
 
+# Bump when the search procedure changes in a way that can change results, so entries cached by the old
+# procedure (possibly in a shared Redis) are never mixed with new ones. v2: every search starts from a clean engine.
+CACHE_VERSION = 2
+
+
 def cache_key(board: chess.Board, depth: int, multipv: int) -> str:
-    return f"{board.epd()}|{depth}|{multipv}"
+    return f"v{CACHE_VERSION}|{board.epd()}|{depth}|{multipv}"
 
 
 def _terminal_eval(board: chess.Board, depth: int, multipv: int) -> PositionEval:
@@ -90,10 +95,13 @@ class EnginePool:
 
     async def _spawn(self):
         _, eng = await chess.engine.popen_uci(self.path)
-        try:
-            await eng.configure({"Threads": 1, "Hash": self.hash_mb})
-        except chess.engine.EngineError:
-            pass
+        # One thread is required for reproducible results; set each option on its own so one failing can't skip the other.
+        for name, value in (("Threads", 1), ("Hash", self.hash_mb)):
+            try:
+                await eng.configure({name: value})
+            except chess.engine.EngineError:
+                log.warning("engine rejected %s=%s%s", name, value,
+                            "; results may not be reproducible" if name == "Threads" else "")
         self._all.append(eng)
         self._free.put_nowait(eng)
         return eng
@@ -136,7 +144,10 @@ class EnginePool:
         crashed = False
         try:
             mpv = max(1, min(multipv, board.legal_moves.count()))
-            infos = await eng.analyse(board, chess.engine.Limit(depth=depth), multipv=mpv)
+            # A fresh `game` token makes python-chess send `ucinewgame` first, which wipes the hash table and history
+            # tables. Without it a worker's leftovers from earlier searches leak into this one and the result depends
+            # on which worker got which position.
+            infos = await eng.analyse(board, chess.engine.Limit(depth=depth), multipv=mpv, game=object())
         except (chess.engine.EngineTerminatedError, chess.engine.EngineError):
             crashed = True
             raise
