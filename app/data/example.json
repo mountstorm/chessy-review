@@ -1,0 +1,5332 @@
+{
+ "depth": 18,
+ "multipv": 3,
+ "engine": "Stockfish 19",
+ "start": {
+  "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+  "eval": {
+   "cp": 31,
+   "mate": null,
+   "win": 0.5285,
+   "terminal": null
+  },
+  "total": 23
+ },
+ "moves": [
+  {
+   "ply": 1,
+   "move_no": 1,
+   "mover": "white",
+   "san": "e4",
+   "uci": "e2e4",
+   "fen_before": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+   "fen_after": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
+   "label": "best",
+   "loss": 0.0,
+   "accuracy": 100.0,
+   "phase": "opening",
+   "clock_left": null,
+   "eval_before": {
+    "cp": 31,
+    "mate": null,
+    "win": 0.5285,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": 31,
+    "mate": null,
+    "win": 0.5285,
+    "terminal": null
+   },
+   "best": {
+    "san": "d4",
+    "uci": "d2d4",
+    "pv_san": [
+     "d4",
+     "d5",
+     "c4",
+     "e6",
+     "Nf3",
+     "Nf6"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "d4",
+     "uci": "d2d4",
+     "cp": 31,
+     "mate": null,
+     "win": 0.5285,
+     "pv_san": [
+      "d4",
+      "d5",
+      "c4",
+      "e6",
+      "Nf3",
+      "Nf6"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "Nf3",
+     "uci": "g1f3",
+     "cp": 29,
+     "mate": null,
+     "win": 0.5267,
+     "pv_san": [
+      "Nf3",
+      "Nf6",
+      "c4",
+      "c5",
+      "Nc3",
+      "e6"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "e4",
+     "uci": "e2e4",
+     "cp": 24,
+     "mate": null,
+     "win": 0.5221,
+     "pv_san": [
+      "e4",
+      "e5",
+      "Nf3",
+      "Nc6",
+      "Bb5",
+      "a6"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": {
+     "from": "d2",
+     "to": "d4",
+     "color": "green"
+    },
+    "played": {
+     "from": "e2",
+     "to": "e4",
+     "color": "blue"
+    },
+    "threat": {
+     "from": "e7",
+     "to": "e5",
+     "color": "red"
+    }
+   },
+   "visuals": {
+    "hanging": [],
+    "king_safety": {
+     "white": 88,
+     "black": 100
+    },
+    "mobility": {
+     "white": 30,
+     "black": 20
+    },
+    "heatmap": [
+     0,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     0,
+     1,
+     1,
+     1,
+     4,
+     4,
+     1,
+     1,
+     1,
+     2,
+     2,
+     3,
+     2,
+     2,
+     3,
+     2,
+     2,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     1,
+     0,
+     1,
+     0,
+     1,
+     0,
+     1,
+     -1,
+     -2,
+     -3,
+     -2,
+     -2,
+     -3,
+     -2,
+     -2,
+     -1,
+     -1,
+     -1,
+     -4,
+     -4,
+     -1,
+     -1,
+     -1,
+     0,
+     -1,
+     -1,
+     -1,
+     -1,
+     -1,
+     -1,
+     0
+    ]
+   },
+   "motifs": {
+    "present": [],
+    "created": [],
+    "missed": []
+   },
+   "missed_motifs": [],
+   "critical": {
+    "is_critical": false,
+    "reasons": []
+   },
+   "comment": "Best move."
+  },
+  {
+   "ply": 2,
+   "move_no": 1,
+   "mover": "black",
+   "san": "e5",
+   "uci": "e7e5",
+   "fen_before": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
+   "fen_after": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+   "label": "excellent",
+   "loss": 0.0092,
+   "accuracy": 96.0,
+   "phase": "opening",
+   "clock_left": null,
+   "eval_before": {
+    "cp": 31,
+    "mate": null,
+    "win": 0.5285,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": 41,
+    "mate": null,
+    "win": 0.5377,
+    "terminal": null
+   },
+   "best": {
+    "san": "c5",
+    "uci": "c7c5",
+    "pv_san": [
+     "c5",
+     "Nf3",
+     "Nc6",
+     "d4",
+     "cxd4",
+     "Nxd4"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "c5",
+     "uci": "c7c5",
+     "cp": 31,
+     "mate": null,
+     "win": 0.4715,
+     "pv_san": [
+      "c5",
+      "Nf3",
+      "Nc6",
+      "d4",
+      "cxd4",
+      "Nxd4"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "c6",
+     "uci": "c7c6",
+     "cp": 32,
+     "mate": null,
+     "win": 0.4706,
+     "pv_san": [
+      "c6",
+      "c4",
+      "d5",
+      "cxd5",
+      "cxd5",
+      "exd5"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "e5",
+     "uci": "e7e5",
+     "cp": 35,
+     "mate": null,
+     "win": 0.4678,
+     "pv_san": [
+      "e5",
+      "Nf3",
+      "Nc6",
+      "Bb5",
+      "a6",
+      "Ba4"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": {
+     "from": "c7",
+     "to": "c5",
+     "color": "green"
+    },
+    "played": {
+     "from": "e7",
+     "to": "e5",
+     "color": "blue"
+    },
+    "threat": {
+     "from": "d2",
+     "to": "d4",
+     "color": "red"
+    }
+   },
+   "visuals": {
+    "hanging": [],
+    "king_safety": {
+     "white": 88,
+     "black": 88
+    },
+    "mobility": {
+     "white": 29,
+     "black": 29
+    },
+    "heatmap": [
+     0,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     0,
+     1,
+     1,
+     1,
+     4,
+     4,
+     1,
+     1,
+     1,
+     1,
+     2,
+     3,
+     2,
+     2,
+     3,
+     2,
+     2,
+     0,
+     -1,
+     1,
+     -1,
+     0,
+     -1,
+     1,
+     -1,
+     0,
+     1,
+     -1,
+     1,
+     0,
+     1,
+     -1,
+     1,
+     -1,
+     -2,
+     -3,
+     -2,
+     -2,
+     -3,
+     -2,
+     -2,
+     -1,
+     -1,
+     -1,
+     -4,
+     -4,
+     -1,
+     -1,
+     -1,
+     0,
+     -1,
+     -1,
+     -1,
+     -1,
+     -1,
+     -1,
+     0
+    ]
+   },
+   "motifs": {
+    "present": [],
+    "created": [],
+    "missed": []
+   },
+   "missed_motifs": [],
+   "critical": {
+    "is_critical": false,
+    "reasons": []
+   },
+   "comment": "Excellent, practically as good as the best move."
+  },
+  {
+   "ply": 3,
+   "move_no": 2,
+   "mover": "white",
+   "san": "Nf3",
+   "uci": "g1f3",
+   "fen_before": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+   "fen_after": "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2",
+   "label": "best",
+   "loss": 0.0,
+   "accuracy": 100.0,
+   "phase": "opening",
+   "clock_left": null,
+   "eval_before": {
+    "cp": 41,
+    "mate": null,
+    "win": 0.5377,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": 37,
+    "mate": null,
+    "win": 0.534,
+    "terminal": null
+   },
+   "best": {
+    "san": "Nf3",
+    "uci": "g1f3",
+    "pv_san": [
+     "Nf3",
+     "Nc6",
+     "Bb5",
+     "a6",
+     "Ba4",
+     "Nf6"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "Nf3",
+     "uci": "g1f3",
+     "cp": 41,
+     "mate": null,
+     "win": 0.5377,
+     "pv_san": [
+      "Nf3",
+      "Nc6",
+      "Bb5",
+      "a6",
+      "Ba4",
+      "Nf6"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "Nc3",
+     "uci": "b1c3",
+     "cp": 12,
+     "mate": null,
+     "win": 0.511,
+     "pv_san": [
+      "Nc3",
+      "Nf6",
+      "Nf3",
+      "Nc6",
+      "Bb5",
+      "Bb4"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "Bc4",
+     "uci": "f1c4",
+     "cp": 9,
+     "mate": null,
+     "win": 0.5083,
+     "pv_san": [
+      "Bc4",
+      "Nf6",
+      "d3",
+      "c6",
+      "Nf3",
+      "d5"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": null,
+    "played": {
+     "from": "g1",
+     "to": "f3",
+     "color": "blue"
+    },
+    "threat": {
+     "from": "g8",
+     "to": "f6",
+     "color": "red"
+    }
+   },
+   "visuals": {
+    "hanging": [
+     {
+      "square": "e5",
+      "color": "black",
+      "piece": "P",
+      "reason": "undefended"
+     }
+    ],
+    "king_safety": {
+     "white": 88,
+     "black": 88
+    },
+    "mobility": {
+     "white": 27,
+     "black": 29
+    },
+    "heatmap": [
+     0,
+     1,
+     1,
+     1,
+     2,
+     2,
+     2,
+     0,
+     1,
+     1,
+     1,
+     5,
+     3,
+     1,
+     1,
+     2,
+     1,
+     2,
+     3,
+     2,
+     2,
+     2,
+     2,
+     1,
+     0,
+     -1,
+     1,
+     0,
+     0,
+     -1,
+     0,
+     0,
+     0,
+     1,
+     -1,
+     1,
+     1,
+     1,
+     0,
+     0,
+     -1,
+     -2,
+     -3,
+     -2,
+     -2,
+     -3,
+     -2,
+     -2,
+     -1,
+     -1,
+     -1,
+     -4,
+     -4,
+     -1,
+     -1,
+     -1,
+     0,
+     -1,
+     -1,
+     -1,
+     -1,
+     -1,
+     -1,
+     0
+    ]
+   },
+   "motifs": {
+    "present": [
+     {
+      "type": "hanging",
+      "side": "white",
+      "squares": [
+       "e5"
+      ],
+      "description": "black pawn on e5 can be captured (undefended)"
+     }
+    ],
+    "created": [
+     {
+      "type": "hanging",
+      "side": "white",
+      "squares": [
+       "e5"
+      ],
+      "description": "black pawn on e5 can be captured (undefended)"
+     }
+    ],
+    "missed": []
+   },
+   "missed_motifs": [],
+   "critical": {
+    "is_critical": false,
+    "reasons": []
+   },
+   "comment": "Best move."
+  },
+  {
+   "ply": 4,
+   "move_no": 2,
+   "mover": "black",
+   "san": "Nc6",
+   "uci": "b8c6",
+   "fen_before": "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2",
+   "fen_after": "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3",
+   "label": "best",
+   "loss": 0.0,
+   "accuracy": 100.0,
+   "phase": "opening",
+   "clock_left": null,
+   "eval_before": {
+    "cp": 37,
+    "mate": null,
+    "win": 0.534,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": 40,
+    "mate": null,
+    "win": 0.5368,
+    "terminal": null
+   },
+   "best": {
+    "san": "Nc6",
+    "uci": "b8c6",
+    "pv_san": [
+     "Nc6",
+     "Bb5",
+     "a6",
+     "Ba4",
+     "Nf6",
+     "O-O"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "Nc6",
+     "uci": "b8c6",
+     "cp": 37,
+     "mate": null,
+     "win": 0.466,
+     "pv_san": [
+      "Nc6",
+      "Bb5",
+      "a6",
+      "Ba4",
+      "Nf6",
+      "O-O"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "Nf6",
+     "uci": "g8f6",
+     "cp": 44,
+     "mate": null,
+     "win": 0.4596,
+     "pv_san": [
+      "Nf6",
+      "Nxe5",
+      "d6",
+      "Nf3",
+      "Nxe4",
+      "d4"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "d6",
+     "uci": "d7d6",
+     "cp": 65,
+     "mate": null,
+     "win": 0.4405,
+     "pv_san": [
+      "d6",
+      "d4",
+      "exd4",
+      "Nxd4",
+      "Nf6",
+      "Nc3"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": null,
+    "played": {
+     "from": "b8",
+     "to": "c6",
+     "color": "blue"
+    },
+    "threat": {
+     "from": "f3",
+     "to": "e5",
+     "color": "red"
+    }
+   },
+   "visuals": {
+    "hanging": [],
+    "king_safety": {
+     "white": 88,
+     "black": 88
+    },
+    "mobility": {
+     "white": 27,
+     "black": 31
+    },
+    "heatmap": [
+     0,
+     1,
+     1,
+     1,
+     2,
+     2,
+     2,
+     0,
+     1,
+     1,
+     1,
+     5,
+     3,
+     1,
+     1,
+     2,
+     1,
+     2,
+     3,
+     2,
+     2,
+     2,
+     2,
+     1,
+     0,
+     -2,
+     1,
+     -1,
+     0,
+     -1,
+     0,
+     0,
+     -1,
+     1,
+     -1,
+     1,
+     0,
+     1,
+     0,
+     0,
+     0,
+     -2,
+     -2,
+     -2,
+     -2,
+     -3,
+     -2,
+     -2,
+     -2,
+     -1,
+     -1,
+     -3,
+     -5,
+     -1,
+     -1,
+     -1,
+     0,
+     -2,
+     -2,
+     -2,
+     -1,
+     -1,
+     -1,
+     0
+    ]
+   },
+   "motifs": {
+    "present": [],
+    "created": [],
+    "missed": []
+   },
+   "missed_motifs": [],
+   "critical": {
+    "is_critical": false,
+    "reasons": []
+   },
+   "comment": "Best move."
+  },
+  {
+   "ply": 5,
+   "move_no": 3,
+   "mover": "white",
+   "san": "Bc4",
+   "uci": "f1c4",
+   "fen_before": "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3",
+   "fen_after": "r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3",
+   "label": "good",
+   "loss": 0.0276,
+   "accuracy": 88.3,
+   "phase": "opening",
+   "clock_left": null,
+   "eval_before": {
+    "cp": 40,
+    "mate": null,
+    "win": 0.5368,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": 10,
+    "mate": null,
+    "win": 0.5092,
+    "terminal": null
+   },
+   "best": {
+    "san": "Bb5",
+    "uci": "f1b5",
+    "pv_san": [
+     "Bb5",
+     "a6",
+     "Ba4",
+     "Nf6",
+     "O-O",
+     "Be7"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "Bb5",
+     "uci": "f1b5",
+     "cp": 40,
+     "mate": null,
+     "win": 0.5368,
+     "pv_san": [
+      "Bb5",
+      "a6",
+      "Ba4",
+      "Nf6",
+      "O-O",
+      "Be7"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "Bc4",
+     "uci": "f1c4",
+     "cp": 25,
+     "mate": null,
+     "win": 0.523,
+     "pv_san": [
+      "Bc4",
+      "Nf6",
+      "d3",
+      "Be7",
+      "O-O",
+      "d6"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "Nc3",
+     "uci": "b1c3",
+     "cp": 10,
+     "mate": null,
+     "win": 0.5092,
+     "pv_san": [
+      "Nc3",
+      "Nf6",
+      "Bb5",
+      "Bb4",
+      "O-O",
+      "O-O"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": {
+     "from": "f1",
+     "to": "b5",
+     "color": "green"
+    },
+    "played": {
+     "from": "f1",
+     "to": "c4",
+     "color": "blue"
+    },
+    "threat": {
+     "from": "g8",
+     "to": "f6",
+     "color": "red"
+    }
+   },
+   "visuals": {
+    "hanging": [],
+    "king_safety": {
+     "white": 88,
+     "black": 81
+    },
+    "mobility": {
+     "white": 33,
+     "black": 31
+    },
+    "heatmap": [
+     0,
+     1,
+     1,
+     1,
+     3,
+     3,
+     2,
+     0,
+     2,
+     1,
+     1,
+     5,
+     3,
+     1,
+     0,
+     2,
+     1,
+     3,
+     3,
+     2,
+     2,
+     2,
+     2,
+     1,
+     0,
+     -2,
+     0,
+     -1,
+     0,
+     -1,
+     0,
+     0,
+     -1,
+     1,
+     -1,
+     2,
+     0,
+     1,
+     0,
+     0,
+     0,
+     -2,
+     -2,
+     -2,
+     -1,
+     -3,
+     -2,
+     -2,
+     -2,
+     -1,
+     -1,
+     -3,
+     -5,
+     0,
+     -1,
+     -1,
+     0,
+     -2,
+     -2,
+     -2,
+     -1,
+     -1,
+     -1,
+     0
+    ]
+   },
+   "motifs": {
+    "present": [
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "c4",
+       "f7",
+       "g8"
+      ],
+      "description": "black pawn on f7 is pinned to black knight on g8 by white bishop on c4"
+     }
+    ],
+    "created": [
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "c4",
+       "f7",
+       "g8"
+      ],
+      "description": "black pawn on f7 is pinned to black knight on g8 by white bishop on c4"
+     }
+    ],
+    "missed": []
+   },
+   "missed_motifs": [],
+   "critical": {
+    "is_critical": false,
+    "reasons": []
+   },
+   "comment": "A good move."
+  },
+  {
+   "ply": 6,
+   "move_no": 3,
+   "mover": "black",
+   "san": "Nf6",
+   "uci": "g8f6",
+   "fen_before": "r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3",
+   "fen_after": "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4",
+   "label": "excellent",
+   "loss": 0.0083,
+   "accuracy": 96.3,
+   "phase": "opening",
+   "clock_left": null,
+   "eval_before": {
+    "cp": 10,
+    "mate": null,
+    "win": 0.5092,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": 19,
+    "mate": null,
+    "win": 0.5175,
+    "terminal": null
+   },
+   "best": {
+    "san": "Bc5",
+    "uci": "f8c5",
+    "pv_san": [
+     "Bc5",
+     "O-O",
+     "Nf6",
+     "d3",
+     "O-O",
+     "a4"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "Bc5",
+     "uci": "f8c5",
+     "cp": 10,
+     "mate": null,
+     "win": 0.4908,
+     "pv_san": [
+      "Bc5",
+      "O-O",
+      "Nf6",
+      "d3",
+      "O-O",
+      "a4"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "Nf6",
+     "uci": "g8f6",
+     "cp": 15,
+     "mate": null,
+     "win": 0.4862,
+     "pv_san": [
+      "Nf6",
+      "d3",
+      "Bc5",
+      "O-O",
+      "d6",
+      "c3"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "Be7",
+     "uci": "f8e7",
+     "cp": 39,
+     "mate": null,
+     "win": 0.4642,
+     "pv_san": [
+      "Be7",
+      "d4",
+      "exd4",
+      "Nxd4",
+      "Nf6",
+      "Nxc6"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": {
+     "from": "f8",
+     "to": "c5",
+     "color": "green"
+    },
+    "played": {
+     "from": "g8",
+     "to": "f6",
+     "color": "blue"
+    },
+    "threat": {
+     "from": "d2",
+     "to": "d4",
+     "color": "red"
+    }
+   },
+   "visuals": {
+    "hanging": [
+     {
+      "square": "e4",
+      "color": "white",
+      "piece": "P",
+      "reason": "undefended"
+     }
+    ],
+    "king_safety": {
+     "white": 88,
+     "black": 81
+    },
+    "mobility": {
+     "white": 33,
+     "black": 29
+    },
+    "heatmap": [
+     0,
+     1,
+     1,
+     1,
+     3,
+     3,
+     2,
+     0,
+     2,
+     1,
+     1,
+     5,
+     3,
+     1,
+     0,
+     2,
+     1,
+     3,
+     3,
+     2,
+     2,
+     2,
+     2,
+     1,
+     0,
+     -2,
+     0,
+     -1,
+     -1,
+     -1,
+     -1,
+     1,
+     -1,
+     1,
+     -1,
+     1,
+     0,
+     1,
+     1,
+     -1,
+     0,
+     -2,
+     -2,
+     -2,
+     -1,
+     -2,
+     -2,
+     -1,
+     -2,
+     -1,
+     -1,
+     -4,
+     -4,
+     0,
+     -1,
+     -2,
+     0,
+     -2,
+     -2,
+     -2,
+     -2,
+     -2,
+     -2,
+     0
+    ]
+   },
+   "motifs": {
+    "present": [
+     {
+      "type": "hanging",
+      "side": "black",
+      "squares": [
+       "e4"
+      ],
+      "description": "white pawn on e4 can be captured (undefended)"
+     }
+    ],
+    "created": [
+     {
+      "type": "hanging",
+      "side": "black",
+      "squares": [
+       "e4"
+      ],
+      "description": "white pawn on e4 can be captured (undefended)"
+     }
+    ],
+    "missed": []
+   },
+   "missed_motifs": [],
+   "critical": {
+    "is_critical": false,
+    "reasons": []
+   },
+   "comment": "Excellent, practically as good as the best move."
+  },
+  {
+   "ply": 7,
+   "move_no": 4,
+   "mover": "white",
+   "san": "Ng5",
+   "uci": "f3g5",
+   "fen_before": "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4",
+   "fen_after": "r1bqkb1r/pppp1ppp/2n2n2/4p1N1/2B1P3/8/PPPP1PPP/RNBQK2R b KQkq - 5 4",
+   "label": "best",
+   "loss": 0.0,
+   "accuracy": 100.0,
+   "phase": "opening",
+   "clock_left": null,
+   "eval_before": {
+    "cp": 19,
+    "mate": null,
+    "win": 0.5175,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": 6,
+    "mate": null,
+    "win": 0.5055,
+    "terminal": null
+   },
+   "best": {
+    "san": "Ng5",
+    "uci": "f3g5",
+    "pv_san": [
+     "Ng5",
+     "d5",
+     "exd5",
+     "Na5",
+     "Bb5+",
+     "c6"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "Ng5",
+     "uci": "f3g5",
+     "cp": 19,
+     "mate": null,
+     "win": 0.5175,
+     "pv_san": [
+      "Ng5",
+      "d5",
+      "exd5",
+      "Na5",
+      "Bb5+",
+      "c6"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "d3",
+     "uci": "d2d3",
+     "cp": 18,
+     "mate": null,
+     "win": 0.5166,
+     "pv_san": [
+      "d3",
+      "h6",
+      "c3",
+      "Bc5",
+      "O-O",
+      "d6"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "d4",
+     "uci": "d2d4",
+     "cp": 9,
+     "mate": null,
+     "win": 0.5083,
+     "pv_san": [
+      "d4",
+      "exd4",
+      "e5",
+      "d5",
+      "Bb5",
+      "Ne4"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": null,
+    "played": {
+     "from": "f3",
+     "to": "g5",
+     "color": "blue"
+    },
+    "threat": {
+     "from": "f6",
+     "to": "e4",
+     "color": "red"
+    }
+   },
+   "visuals": {
+    "hanging": [],
+    "king_safety": {
+     "white": 88,
+     "black": 74
+    },
+    "mobility": {
+     "white": 38,
+     "black": 28
+    },
+    "heatmap": [
+     0,
+     1,
+     1,
+     1,
+     2,
+     3,
+     1,
+     0,
+     2,
+     1,
+     1,
+     4,
+     3,
+     1,
+     0,
+     1,
+     1,
+     3,
+     3,
+     2,
+     2,
+     3,
+     2,
+     2,
+     0,
+     -2,
+     0,
+     -2,
+     0,
+     -1,
+     0,
+     0,
+     -1,
+     1,
+     -1,
+     1,
+     -1,
+     1,
+     0,
+     0,
+     0,
+     -2,
+     -2,
+     -2,
+     0,
+     -2,
+     -2,
+     -1,
+     -2,
+     -1,
+     -1,
+     -4,
+     -4,
+     1,
+     -1,
+     -1,
+     0,
+     -2,
+     -2,
+     -2,
+     -2,
+     -2,
+     -2,
+     0
+    ]
+   },
+   "motifs": {
+    "present": [
+     {
+      "type": "discovered_attack",
+      "side": "black",
+      "squares": [
+       "d8",
+       "f6",
+       "g5"
+      ],
+      "description": "moving black knight on f6 uncovers black queen on d8 on white knight on g5"
+     }
+    ],
+    "created": [],
+    "missed": []
+   },
+   "missed_motifs": [],
+   "critical": {
+    "is_critical": false,
+    "reasons": []
+   },
+   "comment": "Best move."
+  },
+  {
+   "ply": 8,
+   "move_no": 4,
+   "mover": "black",
+   "san": "d5",
+   "uci": "d7d5",
+   "fen_before": "r1bqkb1r/pppp1ppp/2n2n2/4p1N1/2B1P3/8/PPPP1PPP/RNBQK2R b KQkq - 5 4",
+   "fen_after": "r1bqkb1r/ppp2ppp/2n2n2/3pp1N1/2B1P3/8/PPPP1PPP/RNBQK2R w KQkq - 0 5",
+   "label": "best",
+   "loss": 0.0,
+   "accuracy": 100.0,
+   "phase": "opening",
+   "clock_left": null,
+   "eval_before": {
+    "cp": 6,
+    "mate": null,
+    "win": 0.5055,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": 25,
+    "mate": null,
+    "win": 0.523,
+    "terminal": null
+   },
+   "best": {
+    "san": "d5",
+    "uci": "d7d5",
+    "pv_san": [
+     "d5",
+     "exd5",
+     "Na5",
+     "Bb5+",
+     "c6",
+     "dxc6"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "d5",
+     "uci": "d7d5",
+     "cp": 6,
+     "mate": null,
+     "win": 0.4945,
+     "pv_san": [
+      "d5",
+      "exd5",
+      "Na5",
+      "Bb5+",
+      "c6",
+      "dxc6"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "Bc5",
+     "uci": "f8c5",
+     "cp": 108,
+     "mate": null,
+     "win": 0.4019,
+     "pv_san": [
+      "Bc5",
+      "Nxf7",
+      "Bxf2+",
+      "Kf1",
+      "Qe7",
+      "Nxh8"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "Nxe4",
+     "uci": "f6e4",
+     "cp": 214,
+     "mate": null,
+     "win": 0.3126,
+     "pv_san": [
+      "Nxe4",
+      "Bxf7+",
+      "Ke7",
+      "d4",
+      "h6",
+      "Nxe4"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": null,
+    "played": {
+     "from": "d7",
+     "to": "d5",
+     "color": "blue"
+    },
+    "threat": {
+     "from": "g5",
+     "to": "f7",
+     "color": "red"
+    }
+   },
+   "visuals": {
+    "hanging": [
+     {
+      "square": "c4",
+      "color": "white",
+      "piece": "B",
+      "reason": "undefended"
+     }
+    ],
+    "king_safety": {
+     "white": 88,
+     "black": 69
+    },
+    "mobility": {
+     "white": 37,
+     "black": 37
+    },
+    "heatmap": [
+     0,
+     1,
+     1,
+     1,
+     2,
+     3,
+     1,
+     0,
+     2,
+     1,
+     1,
+     4,
+     3,
+     1,
+     0,
+     1,
+     1,
+     3,
+     3,
+     2,
+     2,
+     3,
+     2,
+     1,
+     0,
+     -2,
+     -1,
+     -2,
+     -1,
+     -1,
+     -1,
+     0,
+     -1,
+     1,
+     -1,
+     0,
+     -1,
+     0,
+     0,
+     0,
+     0,
+     -2,
+     -1,
+     -3,
+     -1,
+     -2,
+     -2,
+     -1,
+     -2,
+     -1,
+     -1,
+     -4,
+     -4,
+     0,
+     -1,
+     -1,
+     0,
+     -2,
+     -2,
+     -2,
+     -2,
+     -2,
+     -2,
+     0
+    ]
+   },
+   "motifs": {
+    "present": [
+     {
+      "type": "hanging",
+      "side": "black",
+      "squares": [
+       "c4"
+      ],
+      "description": "white bishop on c4 can be captured (undefended)"
+     },
+     {
+      "type": "discovered_attack",
+      "side": "black",
+      "squares": [
+       "d8",
+       "f6",
+       "g5"
+      ],
+      "description": "moving black knight on f6 uncovers black queen on d8 on white knight on g5"
+     }
+    ],
+    "created": [
+     {
+      "type": "hanging",
+      "side": "black",
+      "squares": [
+       "c4"
+      ],
+      "description": "white bishop on c4 can be captured (undefended)"
+     }
+    ],
+    "missed": []
+   },
+   "missed_motifs": [],
+   "critical": {
+    "is_critical": false,
+    "reasons": []
+   },
+   "comment": "Best move."
+  },
+  {
+   "ply": 9,
+   "move_no": 5,
+   "mover": "white",
+   "san": "exd5",
+   "uci": "e4d5",
+   "fen_before": "r1bqkb1r/ppp2ppp/2n2n2/3pp1N1/2B1P3/8/PPPP1PPP/RNBQK2R w KQkq - 0 5",
+   "fen_after": "r1bqkb1r/ppp2ppp/2n2n2/3Pp1N1/2B5/8/PPPP1PPP/RNBQK2R b KQkq - 0 5",
+   "label": "great",
+   "loss": 0.0,
+   "accuracy": 100.0,
+   "phase": "opening",
+   "clock_left": null,
+   "eval_before": {
+    "cp": 25,
+    "mate": null,
+    "win": 0.523,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": 15,
+    "mate": null,
+    "win": 0.5138,
+    "terminal": null
+   },
+   "best": {
+    "san": "exd5",
+    "uci": "e4d5",
+    "pv_san": [
+     "exd5",
+     "Na5",
+     "Bb5+",
+     "c6",
+     "dxc6",
+     "bxc6"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "exd5",
+     "uci": "e4d5",
+     "cp": 25,
+     "mate": null,
+     "win": 0.523,
+     "pv_san": [
+      "exd5",
+      "Na5",
+      "Bb5+",
+      "c6",
+      "dxc6",
+      "bxc6"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "Bb5",
+     "uci": "c4b5",
+     "cp": -195,
+     "mate": null,
+     "win": 0.3278,
+     "pv_san": [
+      "Bb5",
+      "dxe4",
+      "Bxc6+",
+      "bxc6",
+      "Qe2",
+      "Bg4"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "Bb3",
+     "uci": "c4b3",
+     "cp": -206,
+     "mate": null,
+     "win": 0.319,
+     "pv_san": [
+      "Bb3",
+      "Nxe4",
+      "Nxe4",
+      "dxe4",
+      "O-O",
+      "Qf6"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": null,
+    "played": {
+     "from": "e4",
+     "to": "d5",
+     "color": "blue"
+    },
+    "threat": {
+     "from": "d5",
+     "to": "c4",
+     "color": "red"
+    }
+   },
+   "visuals": {
+    "hanging": [
+     {
+      "square": "c6",
+      "color": "black",
+      "piece": "N",
+      "reason": "by a cheaper piece"
+     }
+    ],
+    "king_safety": {
+     "white": 80,
+     "black": 61
+    },
+    "mobility": {
+     "white": 38,
+     "black": 37
+    },
+    "heatmap": [
+     0,
+     1,
+     1,
+     1,
+     2,
+     3,
+     1,
+     0,
+     2,
+     1,
+     1,
+     4,
+     3,
+     1,
+     0,
+     1,
+     1,
+     3,
+     3,
+     2,
+     2,
+     3,
+     2,
+     1,
+     0,
+     -2,
+     0,
+     -2,
+     0,
+     -1,
+     -1,
+     0,
+     -1,
+     1,
+     -1,
+     -1,
+     -1,
+     -1,
+     0,
+     0,
+     0,
+     -2,
+     0,
+     -3,
+     0,
+     -2,
+     -2,
+     -1,
+     -2,
+     -1,
+     -1,
+     -4,
+     -4,
+     0,
+     -1,
+     -1,
+     0,
+     -2,
+     -2,
+     -2,
+     -2,
+     -2,
+     -2,
+     0
+    ]
+   },
+   "motifs": {
+    "present": [
+     {
+      "type": "hanging",
+      "side": "white",
+      "squares": [
+       "c6"
+      ],
+      "description": "black knight on c6 can be captured (by a cheaper piece)"
+     },
+     {
+      "type": "discovered_attack",
+      "side": "black",
+      "squares": [
+       "d8",
+       "f6",
+       "g5"
+      ],
+      "description": "moving black knight on f6 uncovers black queen on d8 on white knight on g5"
+     }
+    ],
+    "created": [
+     {
+      "type": "hanging",
+      "side": "white",
+      "squares": [
+       "c6"
+      ],
+      "description": "black knight on c6 can be captured (by a cheaper piece)"
+     }
+    ],
+    "missed": []
+   },
+   "missed_motifs": [],
+   "critical": {
+    "is_critical": true,
+    "reasons": [
+     "only_move"
+    ]
+   },
+   "comment": "Great move: it was the only move that kept your position intact."
+  },
+  {
+   "ply": 10,
+   "move_no": 5,
+   "mover": "black",
+   "san": "Nxd5",
+   "uci": "f6d5",
+   "fen_before": "r1bqkb1r/ppp2ppp/2n2n2/3Pp1N1/2B5/8/PPPP1PPP/RNBQK2R b KQkq - 0 5",
+   "fen_after": "r1bqkb1r/ppp2ppp/2n5/3np1N1/2B5/8/PPPP1PPP/RNBQK2R w KQkq - 0 6",
+   "label": "inaccuracy",
+   "loss": 0.0861,
+   "accuracy": 67.7,
+   "phase": "opening",
+   "clock_left": null,
+   "eval_before": {
+    "cp": 15,
+    "mate": null,
+    "win": 0.5138,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": 110,
+    "mate": null,
+    "win": 0.5999,
+    "terminal": null
+   },
+   "best": {
+    "san": "Na5",
+    "uci": "c6a5",
+    "pv_san": [
+     "Na5",
+     "Bb5+",
+     "c6",
+     "dxc6",
+     "bxc6",
+     "Bd3"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "Na5",
+     "uci": "c6a5",
+     "cp": 15,
+     "mate": null,
+     "win": 0.4862,
+     "pv_san": [
+      "Na5",
+      "Bb5+",
+      "c6",
+      "dxc6",
+      "bxc6",
+      "Bd3"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "b5",
+     "uci": "b7b5",
+     "cp": 32,
+     "mate": null,
+     "win": 0.4706,
+     "pv_san": [
+      "b5",
+      "Bf1",
+      "Nxd5",
+      "Bxb5",
+      "Bb7",
+      "d4"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "Nd4",
+     "uci": "c6d4",
+     "cp": 60,
+     "mate": null,
+     "win": 0.445,
+     "pv_san": [
+      "Nd4",
+      "c3",
+      "b5",
+      "Bf1",
+      "Nxd5",
+      "cxd4"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": {
+     "from": "c6",
+     "to": "a5",
+     "color": "green"
+    },
+    "played": {
+     "from": "f6",
+     "to": "d5",
+     "color": "blue"
+    },
+    "threat": {
+     "from": "d5",
+     "to": "c6",
+     "color": "red"
+    }
+   },
+   "visuals": {
+    "hanging": [
+     {
+      "square": "g5",
+      "color": "white",
+      "piece": "N",
+      "reason": "undefended"
+     }
+    ],
+    "king_safety": {
+     "white": 80,
+     "black": 61
+    },
+    "mobility": {
+     "white": 37,
+     "black": 41
+    },
+    "heatmap": [
+     0,
+     1,
+     1,
+     1,
+     2,
+     3,
+     1,
+     0,
+     2,
+     1,
+     1,
+     4,
+     3,
+     1,
+     0,
+     1,
+     1,
+     3,
+     2,
+     2,
+     1,
+     3,
+     2,
+     1,
+     0,
+     -3,
+     0,
+     -2,
+     1,
+     -2,
+     0,
+     0,
+     -1,
+     1,
+     -1,
+     0,
+     -1,
+     -1,
+     -1,
+     1,
+     0,
+     -3,
+     -1,
+     -3,
+     -1,
+     -3,
+     -2,
+     -1,
+     -2,
+     -1,
+     -2,
+     -3,
+     -5,
+     0,
+     -1,
+     0,
+     0,
+     -2,
+     -2,
+     -2,
+     -1,
+     -2,
+     -1,
+     0
+    ]
+   },
+   "motifs": {
+    "present": [
+     {
+      "type": "hanging",
+      "side": "black",
+      "squares": [
+       "g5"
+      ],
+      "description": "white knight on g5 can be captured (undefended)"
+     },
+     {
+      "type": "discovered_attack",
+      "side": "white",
+      "squares": [
+       "d1",
+       "d2",
+       "d5"
+      ],
+      "description": "moving white pawn on d2 uncovers white queen on d1 on black knight on d5"
+     }
+    ],
+    "created": [
+     {
+      "type": "hanging",
+      "side": "black",
+      "squares": [
+       "g5"
+      ],
+      "description": "white knight on g5 can be captured (undefended)"
+     }
+    ],
+    "missed": [
+     {
+      "type": "hanging",
+      "side": "black",
+      "squares": [
+       "c4"
+      ],
+      "description": "white bishop on c4 can be captured (undefended)"
+     }
+    ]
+   },
+   "missed_motifs": [
+    "hanging"
+   ],
+   "critical": {
+    "is_critical": false,
+    "reasons": []
+   },
+   "comment": "An inaccuracy. Na5 was better (you lost 9% win chance). It would have created: hanging."
+  },
+  {
+   "ply": 11,
+   "move_no": 6,
+   "mover": "white",
+   "san": "Nxf7",
+   "uci": "g5f7",
+   "fen_before": "r1bqkb1r/ppp2ppp/2n5/3np1N1/2B5/8/PPPP1PPP/RNBQK2R w KQkq - 0 6",
+   "fen_after": "r1bqkb1r/ppp2Npp/2n5/3np3/2B5/8/PPPP1PPP/RNBQK2R b KQkq - 0 6",
+   "label": "brilliant",
+   "loss": 0.0,
+   "accuracy": 100.0,
+   "phase": "opening",
+   "clock_left": null,
+   "eval_before": {
+    "cp": 110,
+    "mate": null,
+    "win": 0.5999,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": 133,
+    "mate": null,
+    "win": 0.62,
+    "terminal": null
+   },
+   "best": {
+    "san": "Nxf7",
+    "uci": "g5f7",
+    "pv_san": [
+     "Nxf7",
+     "Kxf7",
+     "Qf3+",
+     "Ke6",
+     "Nc3",
+     "Nb4"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "Nxf7",
+     "uci": "g5f7",
+     "cp": 110,
+     "mate": null,
+     "win": 0.5999,
+     "pv_san": [
+      "Nxf7",
+      "Kxf7",
+      "Qf3+",
+      "Ke6",
+      "Nc3",
+      "Nb4"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "d4",
+     "uci": "d2d4",
+     "cp": 51,
+     "mate": null,
+     "win": 0.5468,
+     "pv_san": [
+      "d4",
+      "Nxd4",
+      "c3",
+      "b5",
+      "Bd3",
+      "h6"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "d3",
+     "uci": "d2d3",
+     "cp": -13,
+     "mate": null,
+     "win": 0.488,
+     "pv_san": [
+      "d3",
+      "f6",
+      "Nc3",
+      "Bb4",
+      "Ne4",
+      "Nb6"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": null,
+    "played": {
+     "from": "g5",
+     "to": "f7",
+     "color": "blue"
+    },
+    "threat": {
+     "from": "d8",
+     "to": "g5",
+     "color": "red"
+    }
+   },
+   "visuals": {
+    "hanging": [
+     {
+      "square": "h8",
+      "color": "black",
+      "piece": "R",
+      "reason": "undefended"
+     },
+     {
+      "square": "d8",
+      "color": "black",
+      "piece": "Q",
+      "reason": "by a cheaper piece"
+     },
+     {
+      "square": "f7",
+      "color": "white",
+      "piece": "N",
+      "reason": "undefended"
+     }
+    ],
+    "king_safety": {
+     "white": 80,
+     "black": 41
+    },
+    "mobility": {
+     "white": 37,
+     "black": 42
+    },
+    "heatmap": [
+     0,
+     1,
+     1,
+     1,
+     2,
+     3,
+     1,
+     0,
+     2,
+     1,
+     1,
+     4,
+     3,
+     1,
+     0,
+     1,
+     1,
+     3,
+     2,
+     2,
+     1,
+     2,
+     2,
+     0,
+     0,
+     -3,
+     0,
+     -2,
+     0,
+     -2,
+     0,
+     -1,
+     -1,
+     1,
+     -1,
+     0,
+     0,
+     -1,
+     0,
+     1,
+     0,
+     -3,
+     -1,
+     -2,
+     -1,
+     -3,
+     -1,
+     0,
+     -2,
+     -1,
+     -2,
+     -3,
+     -5,
+     -1,
+     -1,
+     -1,
+     0,
+     -2,
+     -2,
+     -1,
+     -1,
+     -2,
+     -1,
+     1
+    ]
+   },
+   "motifs": {
+    "present": [
+     {
+      "type": "hanging",
+      "side": "white",
+      "squares": [
+       "h8"
+      ],
+      "description": "black rook on h8 can be captured (undefended)"
+     },
+     {
+      "type": "hanging",
+      "side": "white",
+      "squares": [
+       "d8"
+      ],
+      "description": "black queen on d8 can be captured (by a cheaper piece)"
+     },
+     {
+      "type": "hanging",
+      "side": "black",
+      "squares": [
+       "f7"
+      ],
+      "description": "white knight on f7 can be captured (undefended)"
+     },
+     {
+      "type": "fork",
+      "side": "white",
+      "squares": [
+       "f7",
+       "d8",
+       "h8"
+      ],
+      "description": "white knight on f7 forks black queen on d8, black rook on h8"
+     },
+     {
+      "type": "discovered_attack",
+      "side": "white",
+      "squares": [
+       "d1",
+       "d2",
+       "d5"
+      ],
+      "description": "moving white pawn on d2 uncovers white queen on d1 on black knight on d5"
+     }
+    ],
+    "created": [
+     {
+      "type": "hanging",
+      "side": "white",
+      "squares": [
+       "h8"
+      ],
+      "description": "black rook on h8 can be captured (undefended)"
+     },
+     {
+      "type": "hanging",
+      "side": "white",
+      "squares": [
+       "d8"
+      ],
+      "description": "black queen on d8 can be captured (by a cheaper piece)"
+     },
+     {
+      "type": "fork",
+      "side": "white",
+      "squares": [
+       "f7",
+       "d8",
+       "h8"
+      ],
+      "description": "white knight on f7 forks black queen on d8, black rook on h8"
+     }
+    ],
+    "missed": []
+   },
+   "missed_motifs": [],
+   "critical": {
+    "is_critical": false,
+    "reasons": []
+   },
+   "comment": "Brilliant! A sound sacrifice that the engine endorses."
+  },
+  {
+   "ply": 12,
+   "move_no": 6,
+   "mover": "black",
+   "san": "Kxf7",
+   "uci": "e8f7",
+   "fen_before": "r1bqkb1r/ppp2Npp/2n5/3np3/2B5/8/PPPP1PPP/RNBQK2R b KQkq - 0 6",
+   "fen_after": "r1bq1b1r/ppp2kpp/2n5/3np3/2B5/8/PPPP1PPP/RNBQK2R w KQ - 0 7",
+   "label": "great",
+   "loss": 0.0,
+   "accuracy": 100.0,
+   "phase": "opening",
+   "clock_left": null,
+   "eval_before": {
+    "cp": 133,
+    "mate": null,
+    "win": 0.62,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": 80,
+    "mate": null,
+    "win": 0.5731,
+    "terminal": null
+   },
+   "best": {
+    "san": "Kxf7",
+    "uci": "e8f7",
+    "pv_san": [
+     "Kxf7",
+     "Qf3+",
+     "Ke6",
+     "Nc3",
+     "Nb4",
+     "O-O"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "Kxf7",
+     "uci": "e8f7",
+     "cp": 133,
+     "mate": null,
+     "win": 0.38,
+     "pv_san": [
+      "Kxf7",
+      "Qf3+",
+      "Ke6",
+      "Nc3",
+      "Nb4",
+      "O-O"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "Qh4",
+     "uci": "d8h4",
+     "cp": 541,
+     "mate": null,
+     "win": 0.12,
+     "pv_san": [
+      "Qh4",
+      "Bxd5",
+      "Bg4",
+      "g3",
+      "Qh3",
+      "Ng5"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "Qf6",
+     "uci": "d8f6",
+     "cp": 594,
+     "mate": null,
+     "win": 0.1009,
+     "pv_san": [
+      "Qf6",
+      "Bxd5",
+      "Bc5",
+      "O-O",
+      "Rf8",
+      "Nc3"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": null,
+    "played": {
+     "from": "e8",
+     "to": "f7",
+     "color": "blue"
+    },
+    "threat": {
+     "from": "f7",
+     "to": "d8",
+     "color": "red"
+    }
+   },
+   "visuals": {
+    "hanging": [],
+    "king_safety": {
+     "white": 80,
+     "black": 68
+    },
+    "mobility": {
+     "white": 31,
+     "black": 46
+    },
+    "heatmap": [
+     0,
+     1,
+     1,
+     1,
+     2,
+     3,
+     1,
+     0,
+     2,
+     1,
+     1,
+     4,
+     3,
+     1,
+     0,
+     1,
+     1,
+     3,
+     2,
+     2,
+     1,
+     2,
+     2,
+     0,
+     0,
+     -3,
+     0,
+     -2,
+     0,
+     -2,
+     0,
+     -1,
+     -1,
+     1,
+     -1,
+     0,
+     -1,
+     -1,
+     -1,
+     1,
+     0,
+     -3,
+     -1,
+     -3,
+     -2,
+     -4,
+     -2,
+     -1,
+     -2,
+     -1,
+     -2,
+     -2,
+     -5,
+     0,
+     -2,
+     -1,
+     0,
+     -2,
+     -2,
+     -1,
+     -2,
+     -3,
+     -2,
+     0
+    ]
+   },
+   "motifs": {
+    "present": [
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "c4",
+       "d5",
+       "f7"
+      ],
+      "description": "black knight on d5 is pinned to the king by white bishop on c4"
+     },
+     {
+      "type": "discovered_attack",
+      "side": "white",
+      "squares": [
+       "d1",
+       "d2",
+       "d5"
+      ],
+      "description": "moving white pawn on d2 uncovers white queen on d1 on black knight on d5"
+     }
+    ],
+    "created": [
+     {
+      "type": "hanging",
+      "side": "black",
+      "squares": [
+       "f7"
+      ],
+      "description": "white knight on f7 can be captured (undefended)"
+     }
+    ],
+    "missed": []
+   },
+   "missed_motifs": [],
+   "critical": {
+    "is_critical": true,
+    "reasons": [
+     "only_move"
+    ]
+   },
+   "comment": "Great move: it was the only move that kept your position intact."
+  },
+  {
+   "ply": 13,
+   "move_no": 7,
+   "mover": "white",
+   "san": "Qf3+",
+   "uci": "d1f3",
+   "fen_before": "r1bq1b1r/ppp2kpp/2n5/3np3/2B5/8/PPPP1PPP/RNBQK2R w KQ - 0 7",
+   "fen_after": "r1bq1b1r/ppp2kpp/2n5/3np3/2B5/5Q2/PPPP1PPP/RNB1K2R b KQ - 1 7",
+   "label": "great",
+   "loss": 0.0,
+   "accuracy": 100.0,
+   "phase": "opening",
+   "clock_left": null,
+   "eval_before": {
+    "cp": 80,
+    "mate": null,
+    "win": 0.5731,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": 84,
+    "mate": null,
+    "win": 0.5767,
+    "terminal": null
+   },
+   "best": {
+    "san": "Qf3+",
+    "uci": "d1f3",
+    "pv_san": [
+     "Qf3+",
+     "Ke6",
+     "Nc3",
+     "Nb4",
+     "O-O",
+     "c6"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "Qf3+",
+     "uci": "d1f3",
+     "cp": 80,
+     "mate": null,
+     "win": 0.5731,
+     "pv_san": [
+      "Qf3+",
+      "Ke6",
+      "Nc3",
+      "Nb4",
+      "O-O",
+      "c6"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "Nc3",
+     "uci": "b1c3",
+     "cp": -417,
+     "mate": null,
+     "win": 0.1772,
+     "pv_san": [
+      "Nc3",
+      "Be6",
+      "Nxd5",
+      "Bxd5",
+      "Qf3+",
+      "Ke6"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "O-O",
+     "uci": "e1g1",
+     "cp": -435,
+     "mate": null,
+     "win": 0.1677,
+     "pv_san": [
+      "O-O",
+      "Be6",
+      "d4",
+      "Nf6",
+      "Bxe6+",
+      "Kxe6"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": null,
+    "played": {
+     "from": "d1",
+     "to": "f3",
+     "color": "blue"
+    },
+    "threat": {
+     "from": "f7",
+     "to": "e8",
+     "color": "red"
+    }
+   },
+   "visuals": {
+    "hanging": [],
+    "king_safety": {
+     "white": 80,
+     "black": 59
+    },
+    "mobility": {
+     "white": 43,
+     "black": 46
+    },
+    "heatmap": [
+     0,
+     1,
+     0,
+     2,
+     1,
+     3,
+     1,
+     0,
+     2,
+     1,
+     0,
+     3,
+     3,
+     2,
+     1,
+     1,
+     2,
+     4,
+     3,
+     3,
+     2,
+     1,
+     3,
+     1,
+     0,
+     -3,
+     0,
+     -2,
+     1,
+     -1,
+     0,
+     -1,
+     -1,
+     1,
+     -1,
+     1,
+     -1,
+     0,
+     -1,
+     1,
+     0,
+     -3,
+     -1,
+     -3,
+     -2,
+     -3,
+     -2,
+     -1,
+     -2,
+     -1,
+     -2,
+     -2,
+     -5,
+     1,
+     -2,
+     -1,
+     0,
+     -2,
+     -2,
+     -1,
+     -2,
+     -3,
+     -2,
+     0
+    ]
+   },
+   "motifs": {
+    "present": [
+     {
+      "type": "skewer",
+      "side": "white",
+      "squares": [
+       "f3",
+       "f7",
+       "f8"
+      ],
+      "description": "white queen on f3 skewers black king on f7 with black bishop on f8 behind it"
+     },
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "c4",
+       "d5",
+       "f7"
+      ],
+      "description": "black knight on d5 is pinned to the king by white bishop on c4"
+     }
+    ],
+    "created": [
+     {
+      "type": "skewer",
+      "side": "white",
+      "squares": [
+       "f3",
+       "f7",
+       "f8"
+      ],
+      "description": "white queen on f3 skewers black king on f7 with black bishop on f8 behind it"
+     }
+    ],
+    "missed": []
+   },
+   "missed_motifs": [],
+   "critical": {
+    "is_critical": true,
+    "reasons": [
+     "only_move"
+    ]
+   },
+   "comment": "Great move: it was the only move that kept your position intact."
+  },
+  {
+   "ply": 14,
+   "move_no": 7,
+   "mover": "black",
+   "san": "Ke6",
+   "uci": "f7e6",
+   "fen_before": "r1bq1b1r/ppp2kpp/2n5/3np3/2B5/5Q2/PPPP1PPP/RNB1K2R b KQ - 1 7",
+   "fen_after": "r1bq1b1r/ppp3pp/2n1k3/3np3/2B5/5Q2/PPPP1PPP/RNB1K2R w KQ - 2 8",
+   "label": "great",
+   "loss": 0.0,
+   "accuracy": 100.0,
+   "phase": "opening",
+   "clock_left": null,
+   "eval_before": {
+    "cp": 84,
+    "mate": null,
+    "win": 0.5767,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": 73,
+    "mate": null,
+    "win": 0.5668,
+    "terminal": null
+   },
+   "best": {
+    "san": "Ke6",
+    "uci": "f7e6",
+    "pv_san": [
+     "Ke6",
+     "Nc3",
+     "Nb4",
+     "O-O",
+     "c6",
+     "d4"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "Ke6",
+     "uci": "f7e6",
+     "cp": 84,
+     "mate": null,
+     "win": 0.4233,
+     "pv_san": [
+      "Ke6",
+      "Nc3",
+      "Nb4",
+      "O-O",
+      "c6",
+      "d4"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "Ke7",
+     "uci": "f7e7",
+     "cp": 276,
+     "mate": null,
+     "win": 0.2658,
+     "pv_san": [
+      "Ke7",
+      "Bxd5",
+      "Nd4",
+      "Qf7+",
+      "Kd6",
+      "Na3"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "Qf6",
+     "uci": "d8f6",
+     "cp": 306,
+     "mate": null,
+     "win": 0.2448,
+     "pv_san": [
+      "Qf6",
+      "Bxd5+",
+      "Ke7",
+      "Bxc6",
+      "bxc6",
+      "Qe3"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": null,
+    "played": {
+     "from": "f7",
+     "to": "e6",
+     "color": "blue"
+    },
+    "threat": null
+   },
+   "visuals": {
+    "hanging": [],
+    "king_safety": {
+     "white": 65,
+     "black": 44
+    },
+    "mobility": {
+     "white": 44,
+     "black": 42
+    },
+    "heatmap": [
+     0,
+     1,
+     0,
+     2,
+     1,
+     3,
+     1,
+     0,
+     2,
+     1,
+     0,
+     3,
+     3,
+     2,
+     1,
+     1,
+     2,
+     4,
+     3,
+     3,
+     2,
+     1,
+     3,
+     2,
+     0,
+     -3,
+     0,
+     -2,
+     1,
+     -1,
+     1,
+     -1,
+     -1,
+     1,
+     -1,
+     0,
+     -2,
+     0,
+     -1,
+     1,
+     0,
+     -3,
+     -1,
+     -4,
+     -1,
+     -3,
+     -1,
+     -1,
+     -2,
+     -1,
+     -2,
+     -3,
+     -5,
+     0,
+     -1,
+     -1,
+     0,
+     -2,
+     -2,
+     -1,
+     -1,
+     -1,
+     -1,
+     0
+    ]
+   },
+   "motifs": {
+    "present": [
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "c4",
+       "d5",
+       "e6"
+      ],
+      "description": "black knight on d5 is pinned to the king by white bishop on c4"
+     }
+    ],
+    "created": [],
+    "missed": []
+   },
+   "missed_motifs": [],
+   "critical": {
+    "is_critical": true,
+    "reasons": [
+     "only_move"
+    ]
+   },
+   "comment": "Great move: it was the only move that kept your position intact."
+  },
+  {
+   "ply": 15,
+   "move_no": 8,
+   "mover": "white",
+   "san": "Nc3",
+   "uci": "b1c3",
+   "fen_before": "r1bq1b1r/ppp3pp/2n1k3/3np3/2B5/5Q2/PPPP1PPP/RNB1K2R w KQ - 2 8",
+   "fen_after": "r1bq1b1r/ppp3pp/2n1k3/3np3/2B5/2N2Q2/PPPP1PPP/R1B1K2R b KQ - 3 8",
+   "label": "great",
+   "loss": 0.0,
+   "accuracy": 100.0,
+   "phase": "opening",
+   "clock_left": null,
+   "eval_before": {
+    "cp": 73,
+    "mate": null,
+    "win": 0.5668,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": 101,
+    "mate": null,
+    "win": 0.5919,
+    "terminal": null
+   },
+   "best": {
+    "san": "Nc3",
+    "uci": "b1c3",
+    "pv_san": [
+     "Nc3",
+     "Nb4",
+     "O-O",
+     "c6",
+     "d4",
+     "Qf6"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "Nc3",
+     "uci": "b1c3",
+     "cp": 73,
+     "mate": null,
+     "win": 0.5668,
+     "pv_san": [
+      "Nc3",
+      "Nb4",
+      "O-O",
+      "c6",
+      "d4",
+      "Qf6"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "O-O",
+     "uci": "e1g1",
+     "cp": -285,
+     "mate": null,
+     "win": 0.2593,
+     "pv_san": [
+      "O-O",
+      "b5",
+      "Bd3",
+      "Nd4",
+      "Qd1",
+      "Kf7"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "Qg3",
+     "uci": "f3g3",
+     "cp": -319,
+     "mate": null,
+     "win": 0.236,
+     "pv_san": [
+      "Qg3",
+      "Nd4",
+      "Nc3",
+      "c6",
+      "O-O",
+      "b5"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": null,
+    "played": {
+     "from": "b1",
+     "to": "c3",
+     "color": "blue"
+    },
+    "threat": {
+     "from": "c6",
+     "to": "d4",
+     "color": "red"
+    }
+   },
+   "visuals": {
+    "hanging": [],
+    "king_safety": {
+     "white": 65,
+     "black": 37
+    },
+    "mobility": {
+     "white": 46,
+     "black": 42
+    },
+    "heatmap": [
+     0,
+     2,
+     1,
+     3,
+     1,
+     3,
+     1,
+     0,
+     3,
+     1,
+     0,
+     2,
+     4,
+     2,
+     1,
+     1,
+     0,
+     3,
+     2,
+     3,
+     2,
+     1,
+     3,
+     2,
+     1,
+     -3,
+     0,
+     -2,
+     2,
+     -1,
+     1,
+     -1,
+     -1,
+     2,
+     -1,
+     1,
+     -2,
+     0,
+     -1,
+     1,
+     0,
+     -3,
+     -1,
+     -4,
+     -1,
+     -3,
+     -1,
+     -1,
+     -2,
+     -1,
+     -2,
+     -3,
+     -5,
+     0,
+     -1,
+     -1,
+     0,
+     -2,
+     -2,
+     -1,
+     -1,
+     -1,
+     -1,
+     0
+    ]
+   },
+   "motifs": {
+    "present": [
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "c4",
+       "d5",
+       "e6"
+      ],
+      "description": "black knight on d5 is pinned to the king by white bishop on c4"
+     }
+    ],
+    "created": [],
+    "missed": []
+   },
+   "missed_motifs": [],
+   "critical": {
+    "is_critical": true,
+    "reasons": [
+     "only_move"
+    ]
+   },
+   "comment": "Great move: it was the only move that kept your position intact."
+  },
+  {
+   "ply": 16,
+   "move_no": 8,
+   "mover": "black",
+   "san": "Nb4",
+   "uci": "c6b4",
+   "fen_before": "r1bq1b1r/ppp3pp/2n1k3/3np3/2B5/2N2Q2/PPPP1PPP/R1B1K2R b KQ - 3 8",
+   "fen_after": "r1bq1b1r/ppp3pp/4k3/3np3/1nB5/2N2Q2/PPPP1PPP/R1B1K2R w KQ - 4 9",
+   "label": "best",
+   "loss": 0.0,
+   "accuracy": 100.0,
+   "phase": "opening",
+   "clock_left": null,
+   "eval_before": {
+    "cp": 101,
+    "mate": null,
+    "win": 0.5919,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": 130,
+    "mate": null,
+    "win": 0.6174,
+    "terminal": null
+   },
+   "best": {
+    "san": "Nb4",
+    "uci": "c6b4",
+    "pv_san": [
+     "Nb4",
+     "O-O",
+     "c6",
+     "d4",
+     "Qf6",
+     "Qd1"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "Nb4",
+     "uci": "c6b4",
+     "cp": 101,
+     "mate": null,
+     "win": 0.4081,
+     "pv_san": [
+      "Nb4",
+      "O-O",
+      "c6",
+      "d4",
+      "Qf6",
+      "Qd1"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "Ne7",
+     "uci": "c6e7",
+     "cp": 162,
+     "mate": null,
+     "win": 0.3551,
+     "pv_san": [
+      "Ne7",
+      "O-O",
+      "c6",
+      "d4",
+      "Kd7",
+      "Bg5"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "Nd4",
+     "uci": "c6d4",
+     "cp": 222,
+     "mate": null,
+     "win": 0.3063,
+     "pv_san": [
+      "Nd4",
+      "Bxd5+",
+      "Kd7",
+      "Qd1",
+      "c6",
+      "Be4"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": null,
+    "played": {
+     "from": "c6",
+     "to": "b4",
+     "color": "blue"
+    },
+    "threat": {
+     "from": "c4",
+     "to": "d5",
+     "color": "red"
+    }
+   },
+   "visuals": {
+    "hanging": [
+     {
+      "square": "c2",
+      "color": "white",
+      "piece": "P",
+      "reason": "undefended"
+     }
+    ],
+    "king_safety": {
+     "white": 65,
+     "black": 37
+    },
+    "mobility": {
+     "white": 45,
+     "black": 41
+    },
+    "heatmap": [
+     0,
+     2,
+     1,
+     3,
+     1,
+     3,
+     1,
+     0,
+     2,
+     1,
+     -1,
+     2,
+     4,
+     2,
+     1,
+     1,
+     1,
+     3,
+     2,
+     2,
+     2,
+     1,
+     3,
+     2,
+     1,
+     -2,
+     0,
+     -1,
+     2,
+     -1,
+     1,
+     -1,
+     0,
+     2,
+     -1,
+     0,
+     -1,
+     0,
+     -1,
+     1,
+     -1,
+     -3,
+     -2,
+     -4,
+     -1,
+     -3,
+     -1,
+     -1,
+     -1,
+     -1,
+     -2,
+     -3,
+     -4,
+     0,
+     -1,
+     -1,
+     0,
+     -1,
+     -2,
+     0,
+     -1,
+     -1,
+     -1,
+     0
+    ]
+   },
+   "motifs": {
+    "present": [
+     {
+      "type": "hanging",
+      "side": "black",
+      "squares": [
+       "c2"
+      ],
+      "description": "white pawn on c2 can be captured (undefended)"
+     },
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "c4",
+       "d5",
+       "e6"
+      ],
+      "description": "black knight on d5 is pinned to the king by white bishop on c4"
+     }
+    ],
+    "created": [
+     {
+      "type": "hanging",
+      "side": "black",
+      "squares": [
+       "c2"
+      ],
+      "description": "white pawn on c2 can be captured (undefended)"
+     }
+    ],
+    "missed": []
+   },
+   "missed_motifs": [],
+   "critical": {
+    "is_critical": false,
+    "reasons": []
+   },
+   "comment": "Best move."
+  },
+  {
+   "ply": 17,
+   "move_no": 9,
+   "mover": "white",
+   "san": "Qe4",
+   "uci": "f3e4",
+   "fen_before": "r1bq1b1r/ppp3pp/4k3/3np3/1nB5/2N2Q2/PPPP1PPP/R1B1K2R w KQ - 4 9",
+   "fen_after": "r1bq1b1r/ppp3pp/4k3/3np3/1nB1Q3/2N5/PPPP1PPP/R1B1K2R b KQ - 5 9",
+   "label": "mistake",
+   "loss": 0.1743,
+   "accuracy": 45.1,
+   "phase": "opening",
+   "clock_left": null,
+   "eval_before": {
+    "cp": 130,
+    "mate": null,
+    "win": 0.6174,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": -62,
+    "mate": null,
+    "win": 0.4432,
+    "terminal": null
+   },
+   "best": {
+    "san": "O-O",
+    "uci": "e1g1",
+    "pv_san": [
+     "O-O",
+     "c6",
+     "d4",
+     "Qf6",
+     "Qd1",
+     "exd4"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "O-O",
+     "uci": "e1g1",
+     "cp": 130,
+     "mate": null,
+     "win": 0.6174,
+     "pv_san": [
+      "O-O",
+      "c6",
+      "d4",
+      "Qf6",
+      "Qd1",
+      "exd4"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "Bb3",
+     "uci": "c4b3",
+     "cp": 81,
+     "mate": null,
+     "win": 0.574,
+     "pv_san": [
+      "Bb3",
+      "c6",
+      "a3",
+      "Qf6",
+      "Qe4",
+      "Qf5"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "d4",
+     "uci": "d2d4",
+     "cp": 10,
+     "mate": null,
+     "win": 0.5092,
+     "pv_san": [
+      "d4",
+      "Nxc2+",
+      "Kd1",
+      "Nxd4",
+      "Bxd5+",
+      "Kd6"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": {
+     "from": "e1",
+     "to": "g1",
+     "color": "green"
+    },
+    "played": {
+     "from": "f3",
+     "to": "e4",
+     "color": "blue"
+    },
+    "threat": {
+     "from": "c7",
+     "to": "c6",
+     "color": "red"
+    }
+   },
+   "visuals": {
+    "hanging": [],
+    "king_safety": {
+     "white": 65,
+     "black": 37
+    },
+    "mobility": {
+     "white": 44,
+     "black": 40
+    },
+    "heatmap": [
+     0,
+     2,
+     1,
+     2,
+     2,
+     3,
+     1,
+     0,
+     2,
+     1,
+     0,
+     2,
+     4,
+     1,
+     1,
+     1,
+     1,
+     3,
+     1,
+     2,
+     2,
+     2,
+     2,
+     1,
+     1,
+     -2,
+     1,
+     0,
+     1,
+     -1,
+     1,
+     0,
+     0,
+     2,
+     -1,
+     0,
+     0,
+     0,
+     -1,
+     0,
+     -1,
+     -3,
+     -2,
+     -4,
+     -1,
+     -4,
+     0,
+     -1,
+     -1,
+     -1,
+     -2,
+     -3,
+     -4,
+     -1,
+     -1,
+     0,
+     0,
+     -1,
+     -2,
+     0,
+     -1,
+     -2,
+     -1,
+     0
+    ]
+   },
+   "motifs": {
+    "present": [
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "c4",
+       "d5",
+       "e6"
+      ],
+      "description": "black knight on d5 is pinned to the king by white bishop on c4"
+     },
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "e4",
+       "e5",
+       "e6"
+      ],
+      "description": "black pawn on e5 is pinned to the king by white queen on e4"
+     },
+     {
+      "type": "discovered_attack",
+      "side": "white",
+      "squares": [
+       "e4",
+       "c4",
+       "b4"
+      ],
+      "description": "moving white bishop on c4 uncovers white queen on e4 on black knight on b4"
+     }
+    ],
+    "created": [
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "e4",
+       "e5",
+       "e6"
+      ],
+      "description": "black pawn on e5 is pinned to the king by white queen on e4"
+     },
+     {
+      "type": "discovered_attack",
+      "side": "white",
+      "squares": [
+       "e4",
+       "c4",
+       "b4"
+      ],
+      "description": "moving white bishop on c4 uncovers white queen on e4 on black knight on b4"
+     }
+    ],
+    "missed": []
+   },
+   "missed_motifs": [],
+   "critical": {
+    "is_critical": true,
+    "reasons": [
+     "turning_point"
+    ]
+   },
+   "comment": "A mistake. O-O was better (you lost 17% win chance)."
+  },
+  {
+   "ply": 18,
+   "move_no": 9,
+   "mover": "black",
+   "san": "c6",
+   "uci": "c7c6",
+   "fen_before": "r1bq1b1r/ppp3pp/4k3/3np3/1nB1Q3/2N5/PPPP1PPP/R1B1K2R b KQ - 5 9",
+   "fen_after": "r1bq1b1r/pp4pp/2p1k3/3np3/1nB1Q3/2N5/PPPP1PPP/R1B1K2R w KQ - 0 10",
+   "label": "best",
+   "loss": 0.0,
+   "accuracy": 100.0,
+   "phase": "opening",
+   "clock_left": null,
+   "eval_before": {
+    "cp": -62,
+    "mate": null,
+    "win": 0.4432,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": -86,
+    "mate": null,
+    "win": 0.4215,
+    "terminal": null
+   },
+   "best": {
+    "san": "c6",
+    "uci": "c7c6",
+    "pv_san": [
+     "c6",
+     "a3",
+     "Na6",
+     "d4",
+     "Nc7",
+     "Bf4"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "c6",
+     "uci": "c7c6",
+     "cp": -62,
+     "mate": null,
+     "win": 0.5568,
+     "pv_san": [
+      "c6",
+      "a3",
+      "Na6",
+      "d4",
+      "Nc7",
+      "Bf4"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "b5",
+     "uci": "b7b5",
+     "cp": 48,
+     "mate": null,
+     "win": 0.4559,
+     "pv_san": [
+      "b5",
+      "Bb3",
+      "c6",
+      "O-O",
+      "Kd7",
+      "Bxd5"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "Bc5",
+     "uci": "f8c5",
+     "cp": 204,
+     "mate": null,
+     "win": 0.3206,
+     "pv_san": [
+      "Bc5",
+      "a3",
+      "Nxc2+",
+      "Qxc2",
+      "c6",
+      "O-O"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": null,
+    "played": {
+     "from": "c7",
+     "to": "c6",
+     "color": "blue"
+    },
+    "threat": {
+     "from": "a2",
+     "to": "a3",
+     "color": "red"
+    }
+   },
+   "visuals": {
+    "hanging": [],
+    "king_safety": {
+     "white": 65,
+     "black": 37
+    },
+    "mobility": {
+     "white": 44,
+     "black": 42
+    },
+    "heatmap": [
+     0,
+     2,
+     1,
+     2,
+     2,
+     3,
+     1,
+     0,
+     2,
+     1,
+     0,
+     2,
+     4,
+     1,
+     1,
+     1,
+     1,
+     3,
+     1,
+     2,
+     2,
+     2,
+     2,
+     1,
+     1,
+     -2,
+     1,
+     0,
+     1,
+     -1,
+     1,
+     0,
+     -1,
+     1,
+     -1,
+     -1,
+     0,
+     0,
+     -1,
+     0,
+     -1,
+     -3,
+     -2,
+     -3,
+     -1,
+     -4,
+     0,
+     -1,
+     -1,
+     -1,
+     -2,
+     -3,
+     -4,
+     -1,
+     -1,
+     0,
+     0,
+     -1,
+     -2,
+     0,
+     -1,
+     -2,
+     -1,
+     0
+    ]
+   },
+   "motifs": {
+    "present": [
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "c4",
+       "d5",
+       "e6"
+      ],
+      "description": "black knight on d5 is pinned to the king by white bishop on c4"
+     },
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "e4",
+       "e5",
+       "e6"
+      ],
+      "description": "black pawn on e5 is pinned to the king by white queen on e4"
+     },
+     {
+      "type": "discovered_attack",
+      "side": "white",
+      "squares": [
+       "e4",
+       "c4",
+       "b4"
+      ],
+      "description": "moving white bishop on c4 uncovers white queen on e4 on black knight on b4"
+     }
+    ],
+    "created": [],
+    "missed": []
+   },
+   "missed_motifs": [],
+   "critical": {
+    "is_critical": false,
+    "reasons": []
+   },
+   "comment": "Best move."
+  },
+  {
+   "ply": 19,
+   "move_no": 10,
+   "mover": "white",
+   "san": "a3",
+   "uci": "a2a3",
+   "fen_before": "r1bq1b1r/pp4pp/2p1k3/3np3/1nB1Q3/2N5/PPPP1PPP/R1B1K2R w KQ - 0 10",
+   "fen_after": "r1bq1b1r/pp4pp/2p1k3/3np3/1nB1Q3/P1N5/1PPP1PPP/R1B1K2R b KQ - 0 10",
+   "label": "best",
+   "loss": 0.0,
+   "accuracy": 100.0,
+   "phase": "opening",
+   "clock_left": null,
+   "eval_before": {
+    "cp": -86,
+    "mate": null,
+    "win": 0.4215,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": -84,
+    "mate": null,
+    "win": 0.4233,
+    "terminal": null
+   },
+   "best": {
+    "san": "a3",
+    "uci": "a2a3",
+    "pv_san": [
+     "a3",
+     "Na6",
+     "d4",
+     "Nc7",
+     "Bf4",
+     "Kf7"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "a3",
+     "uci": "a2a3",
+     "cp": -86,
+     "mate": null,
+     "win": 0.4215,
+     "pv_san": [
+      "a3",
+      "Na6",
+      "d4",
+      "Nc7",
+      "Bf4",
+      "Kf7"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "O-O",
+     "uci": "e1g1",
+     "cp": -194,
+     "mate": null,
+     "win": 0.3286,
+     "pv_san": [
+      "O-O",
+      "Kd6",
+      "f4",
+      "Kc7",
+      "fxe5",
+      "Be6"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "d4",
+     "uci": "d2d4",
+     "cp": -212,
+     "mate": null,
+     "win": 0.3142,
+     "pv_san": [
+      "d4",
+      "Kd7",
+      "O-O",
+      "Kc7",
+      "Re1",
+      "Nxc3"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": null,
+    "played": {
+     "from": "a2",
+     "to": "a3",
+     "color": "blue"
+    },
+    "threat": {
+     "from": "e6",
+     "to": "d7",
+     "color": "red"
+    }
+   },
+   "visuals": {
+    "hanging": [
+     {
+      "square": "b4",
+      "color": "black",
+      "piece": "N",
+      "reason": "by a cheaper piece"
+     }
+    ],
+    "king_safety": {
+     "white": 65,
+     "black": 37
+    },
+    "mobility": {
+     "white": 47,
+     "black": 42
+    },
+    "heatmap": [
+     0,
+     2,
+     1,
+     2,
+     2,
+     3,
+     1,
+     0,
+     2,
+     1,
+     0,
+     2,
+     4,
+     1,
+     1,
+     1,
+     2,
+     2,
+     1,
+     2,
+     2,
+     2,
+     2,
+     1,
+     1,
+     -1,
+     1,
+     0,
+     1,
+     -1,
+     1,
+     0,
+     -1,
+     1,
+     -1,
+     -1,
+     0,
+     0,
+     -1,
+     0,
+     -1,
+     -3,
+     -2,
+     -3,
+     -1,
+     -4,
+     0,
+     -1,
+     -1,
+     -1,
+     -2,
+     -3,
+     -4,
+     -1,
+     -1,
+     0,
+     0,
+     -1,
+     -2,
+     0,
+     -1,
+     -2,
+     -1,
+     0
+    ]
+   },
+   "motifs": {
+    "present": [
+     {
+      "type": "hanging",
+      "side": "white",
+      "squares": [
+       "b4"
+      ],
+      "description": "black knight on b4 can be captured (by a cheaper piece)"
+     },
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "c4",
+       "d5",
+       "e6"
+      ],
+      "description": "black knight on d5 is pinned to the king by white bishop on c4"
+     },
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "e4",
+       "e5",
+       "e6"
+      ],
+      "description": "black pawn on e5 is pinned to the king by white queen on e4"
+     },
+     {
+      "type": "discovered_attack",
+      "side": "white",
+      "squares": [
+       "e4",
+       "c4",
+       "b4"
+      ],
+      "description": "moving white bishop on c4 uncovers white queen on e4 on black knight on b4"
+     }
+    ],
+    "created": [
+     {
+      "type": "hanging",
+      "side": "white",
+      "squares": [
+       "b4"
+      ],
+      "description": "black knight on b4 can be captured (by a cheaper piece)"
+     }
+    ],
+    "missed": []
+   },
+   "missed_motifs": [],
+   "critical": {
+    "is_critical": false,
+    "reasons": []
+   },
+   "comment": "Best move."
+  },
+  {
+   "ply": 20,
+   "move_no": 10,
+   "mover": "black",
+   "san": "Na6",
+   "uci": "b4a6",
+   "fen_before": "r1bq1b1r/pp4pp/2p1k3/3np3/1nB1Q3/P1N5/1PPP1PPP/R1B1K2R b KQ - 0 10",
+   "fen_after": "r1bq1b1r/pp4pp/n1p1k3/3np3/2B1Q3/P1N5/1PPP1PPP/R1B1K2R w KQ - 1 11",
+   "label": "best",
+   "loss": 0.0,
+   "accuracy": 100.0,
+   "phase": "opening",
+   "clock_left": null,
+   "eval_before": {
+    "cp": -84,
+    "mate": null,
+    "win": 0.4233,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": -87,
+    "mate": null,
+    "win": 0.4206,
+    "terminal": null
+   },
+   "best": {
+    "san": "Na6",
+    "uci": "b4a6",
+    "pv_san": [
+     "Na6",
+     "d4",
+     "Nc7",
+     "Bf4",
+     "Kf7",
+     "Bxe5"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "Na6",
+     "uci": "b4a6",
+     "cp": -84,
+     "mate": null,
+     "win": 0.5767,
+     "pv_san": [
+      "Na6",
+      "d4",
+      "Nc7",
+      "Bf4",
+      "Kf7",
+      "Bxe5"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "b5",
+     "uci": "b7b5",
+     "cp": 6,
+     "mate": null,
+     "win": 0.4945,
+     "pv_san": [
+      "b5",
+      "Bb3",
+      "Na6",
+      "d4",
+      "Nc7",
+      "Bf4"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "Nxc2+",
+     "uci": "b4c2",
+     "cp": 170,
+     "mate": null,
+     "win": 0.3484,
+     "pv_san": [
+      "Nxc2+",
+      "Qxc2",
+      "Kf7",
+      "O-O",
+      "Be6",
+      "b4"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": null,
+    "played": {
+     "from": "b4",
+     "to": "a6",
+     "color": "blue"
+    },
+    "threat": {
+     "from": "a3",
+     "to": "b4",
+     "color": "red"
+    }
+   },
+   "visuals": {
+    "hanging": [],
+    "king_safety": {
+     "white": 65,
+     "black": 37
+    },
+    "mobility": {
+     "white": 47,
+     "black": 43
+    },
+    "heatmap": [
+     0,
+     2,
+     1,
+     2,
+     2,
+     3,
+     1,
+     0,
+     3,
+     1,
+     1,
+     2,
+     4,
+     1,
+     1,
+     1,
+     1,
+     2,
+     1,
+     3,
+     2,
+     2,
+     2,
+     1,
+     1,
+     -2,
+     1,
+     0,
+     1,
+     -1,
+     1,
+     0,
+     -1,
+     1,
+     -2,
+     0,
+     0,
+     0,
+     -1,
+     0,
+     0,
+     -3,
+     -1,
+     -3,
+     -1,
+     -4,
+     0,
+     -1,
+     -1,
+     -1,
+     -3,
+     -3,
+     -4,
+     -1,
+     -1,
+     0,
+     0,
+     -2,
+     -2,
+     0,
+     -1,
+     -2,
+     -1,
+     0
+    ]
+   },
+   "motifs": {
+    "present": [
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "c4",
+       "d5",
+       "e6"
+      ],
+      "description": "black knight on d5 is pinned to the king by white bishop on c4"
+     },
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "e4",
+       "e5",
+       "e6"
+      ],
+      "description": "black pawn on e5 is pinned to the king by white queen on e4"
+     },
+     {
+      "type": "discovered_attack",
+      "side": "white",
+      "squares": [
+       "a1",
+       "a3",
+       "a6"
+      ],
+      "description": "moving white pawn on a3 uncovers white rook on a1 on black knight on a6"
+     }
+    ],
+    "created": [],
+    "missed": []
+   },
+   "missed_motifs": [],
+   "critical": {
+    "is_critical": false,
+    "reasons": []
+   },
+   "comment": "Best move."
+  },
+  {
+   "ply": 21,
+   "move_no": 11,
+   "mover": "white",
+   "san": "d4",
+   "uci": "d2d4",
+   "fen_before": "r1bq1b1r/pp4pp/n1p1k3/3np3/2B1Q3/P1N5/1PPP1PPP/R1B1K2R w KQ - 1 11",
+   "fen_after": "r1bq1b1r/pp4pp/n1p1k3/3np3/2BPQ3/P1N5/1PP2PPP/R1B1K2R b KQ - 0 11",
+   "label": "best",
+   "loss": 0.0,
+   "accuracy": 100.0,
+   "phase": "middlegame",
+   "clock_left": null,
+   "eval_before": {
+    "cp": -87,
+    "mate": null,
+    "win": 0.4206,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": -82,
+    "mate": null,
+    "win": 0.4251,
+    "terminal": null
+   },
+   "best": {
+    "san": "d4",
+    "uci": "d2d4",
+    "pv_san": [
+     "d4",
+     "Nc7",
+     "Bf4",
+     "Kf7",
+     "Bxe5",
+     "Be6"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "d4",
+     "uci": "d2d4",
+     "cp": -87,
+     "mate": null,
+     "win": 0.4206,
+     "pv_san": [
+      "d4",
+      "Nc7",
+      "Bf4",
+      "Kf7",
+      "Bxe5",
+      "Be6"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "O-O",
+     "uci": "e1g1",
+     "cp": -87,
+     "mate": null,
+     "win": 0.4206,
+     "pv_san": [
+      "O-O",
+      "Nc7",
+      "f4",
+      "Kd7",
+      "fxe5",
+      "Ke8"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "f4",
+     "uci": "f2f4",
+     "cp": -98,
+     "mate": null,
+     "win": 0.4108,
+     "pv_san": [
+      "f4",
+      "Nc7",
+      "O-O",
+      "Kd7",
+      "fxe5",
+      "Ke8"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": null,
+    "played": {
+     "from": "d2",
+     "to": "d4",
+     "color": "blue"
+    },
+    "threat": {
+     "from": "a6",
+     "to": "c5",
+     "color": "red"
+    }
+   },
+   "visuals": {
+    "hanging": [],
+    "king_safety": {
+     "white": 53,
+     "black": 31
+    },
+    "mobility": {
+     "white": 51,
+     "black": 44
+    },
+    "heatmap": [
+     0,
+     2,
+     1,
+     2,
+     2,
+     3,
+     1,
+     0,
+     3,
+     1,
+     1,
+     2,
+     4,
+     1,
+     1,
+     1,
+     1,
+     2,
+     0,
+     3,
+     2,
+     2,
+     2,
+     1,
+     1,
+     -2,
+     0,
+     0,
+     1,
+     0,
+     1,
+     0,
+     -1,
+     1,
+     -1,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     -3,
+     -1,
+     -3,
+     -1,
+     -4,
+     0,
+     0,
+     -1,
+     -1,
+     -3,
+     -3,
+     -4,
+     -1,
+     -1,
+     0,
+     0,
+     -2,
+     -2,
+     0,
+     -1,
+     -2,
+     -1,
+     0
+    ]
+   },
+   "motifs": {
+    "present": [
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "c4",
+       "d5",
+       "e6"
+      ],
+      "description": "black knight on d5 is pinned to the king by white bishop on c4"
+     },
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "e4",
+       "e5",
+       "e6"
+      ],
+      "description": "black pawn on e5 is pinned to the king by white queen on e4"
+     },
+     {
+      "type": "discovered_attack",
+      "side": "white",
+      "squares": [
+       "a1",
+       "a3",
+       "a6"
+      ],
+      "description": "moving white pawn on a3 uncovers white rook on a1 on black knight on a6"
+     }
+    ],
+    "created": [],
+    "missed": []
+   },
+   "missed_motifs": [],
+   "critical": {
+    "is_critical": false,
+    "reasons": []
+   },
+   "comment": "Best move."
+  },
+  {
+   "ply": 22,
+   "move_no": 11,
+   "mover": "black",
+   "san": "Nc7",
+   "uci": "a6c7",
+   "fen_before": "r1bq1b1r/pp4pp/n1p1k3/3np3/2BPQ3/P1N5/1PP2PPP/R1B1K2R b KQ - 0 11",
+   "fen_after": "r1bq1b1r/ppn3pp/2p1k3/3np3/2BPQ3/P1N5/1PP2PPP/R1B1K2R w KQ - 1 12",
+   "label": "great",
+   "loss": 0.0,
+   "accuracy": 100.0,
+   "phase": "middlegame",
+   "clock_left": null,
+   "eval_before": {
+    "cp": -82,
+    "mate": null,
+    "win": 0.4251,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": -67,
+    "mate": null,
+    "win": 0.4386,
+    "terminal": null
+   },
+   "best": {
+    "san": "Nc7",
+    "uci": "a6c7",
+    "pv_san": [
+     "Nc7",
+     "Bf4",
+     "Kf7",
+     "Bxe5",
+     "Be6",
+     "f4"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "Nc7",
+     "uci": "a6c7",
+     "cp": -82,
+     "mate": null,
+     "win": 0.5749,
+     "pv_san": [
+      "Nc7",
+      "Bf4",
+      "Kf7",
+      "Bxe5",
+      "Be6",
+      "f4"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "Kd7",
+     "uci": "e6d7",
+     "cp": 121,
+     "mate": null,
+     "win": 0.3904,
+     "pv_san": [
+      "Kd7",
+      "Nxd5",
+      "cxd5",
+      "Qxd5+",
+      "Kc7",
+      "Qa5+"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "Be7",
+     "uci": "f8e7",
+     "cp": 126,
+     "mate": null,
+     "win": 0.3861,
+     "pv_san": [
+      "Be7",
+      "Qxe5+",
+      "Kf7",
+      "Nxd5",
+      "cxd5",
+      "Bxd5+"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": null,
+    "played": {
+     "from": "a6",
+     "to": "c7",
+     "color": "blue"
+    },
+    "threat": {
+     "from": "c3",
+     "to": "d5",
+     "color": "red"
+    }
+   },
+   "visuals": {
+    "hanging": [],
+    "king_safety": {
+     "white": 53,
+     "black": 31
+    },
+    "mobility": {
+     "white": 51,
+     "black": 41
+    },
+    "heatmap": [
+     0,
+     2,
+     1,
+     2,
+     2,
+     3,
+     1,
+     0,
+     3,
+     1,
+     1,
+     2,
+     4,
+     1,
+     1,
+     1,
+     1,
+     2,
+     0,
+     3,
+     2,
+     2,
+     2,
+     1,
+     1,
+     -1,
+     0,
+     0,
+     1,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     -1,
+     1,
+     0,
+     0,
+     0,
+     -1,
+     -2,
+     -1,
+     -3,
+     -2,
+     -4,
+     0,
+     0,
+     -1,
+     -1,
+     -2,
+     -3,
+     -4,
+     -1,
+     -1,
+     0,
+     -1,
+     -1,
+     -2,
+     0,
+     -2,
+     -2,
+     -1,
+     0
+    ]
+   },
+   "motifs": {
+    "present": [
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "c4",
+       "d5",
+       "e6"
+      ],
+      "description": "black knight on d5 is pinned to the king by white bishop on c4"
+     },
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "e4",
+       "e5",
+       "e6"
+      ],
+      "description": "black pawn on e5 is pinned to the king by white queen on e4"
+     }
+    ],
+    "created": [],
+    "missed": []
+   },
+   "missed_motifs": [],
+   "critical": {
+    "is_critical": true,
+    "reasons": [
+     "only_move"
+    ]
+   },
+   "comment": "Great move: it was the only move that kept your position intact."
+  },
+  {
+   "ply": 23,
+   "move_no": 12,
+   "mover": "white",
+   "san": "Bf4",
+   "uci": "c1f4",
+   "fen_before": "r1bq1b1r/ppn3pp/2p1k3/3np3/2BPQ3/P1N5/1PP2PPP/R1B1K2R w KQ - 1 12",
+   "fen_after": "r1bq1b1r/ppn3pp/2p1k3/3np3/2BPQB2/P1N5/1PP2PPP/R3K2R b KQ - 2 12",
+   "label": "best",
+   "loss": 0.0,
+   "accuracy": 100.0,
+   "phase": "middlegame",
+   "clock_left": null,
+   "eval_before": {
+    "cp": -67,
+    "mate": null,
+    "win": 0.4386,
+    "terminal": null
+   },
+   "eval_after": {
+    "cp": -74,
+    "mate": null,
+    "win": 0.4323,
+    "terminal": null
+   },
+   "best": {
+    "san": "Bf4",
+    "uci": "c1f4",
+    "pv_san": [
+     "Bf4",
+     "Kf7",
+     "Bxe5",
+     "Be6",
+     "f4",
+     "Nf6"
+    ]
+   },
+   "lines": [
+    {
+     "rank": 1,
+     "san": "Bf4",
+     "uci": "c1f4",
+     "cp": -67,
+     "mate": null,
+     "win": 0.4386,
+     "pv_san": [
+      "Bf4",
+      "Kf7",
+      "Bxe5",
+      "Be6",
+      "f4",
+      "Nf6"
+     ]
+    },
+    {
+     "rank": 2,
+     "san": "dxe5",
+     "uci": "d4e5",
+     "cp": -87,
+     "mate": null,
+     "win": 0.4206,
+     "pv_san": [
+      "dxe5",
+      "Kf7",
+      "O-O",
+      "Be6",
+      "Qf3+",
+      "Kg8"
+     ]
+    },
+    {
+     "rank": 3,
+     "san": "O-O",
+     "uci": "e1g1",
+     "cp": -87,
+     "mate": null,
+     "win": 0.4206,
+     "pv_san": [
+      "O-O",
+      "Kf7",
+      "dxe5",
+      "Be6",
+      "Qf3+",
+      "Kg8"
+     ]
+    }
+   ],
+   "arrows": {
+    "best": null,
+    "played": {
+     "from": "c1",
+     "to": "f4",
+     "color": "blue"
+    },
+    "threat": {
+     "from": "e6",
+     "to": "f7",
+     "color": "red"
+    }
+   },
+   "visuals": {
+    "hanging": [
+     {
+      "square": "f4",
+      "color": "white",
+      "piece": "B",
+      "reason": "by a cheaper piece"
+     }
+    ],
+    "king_safety": {
+     "white": 53,
+     "black": 24
+    },
+    "mobility": {
+     "white": 52,
+     "black": 42
+    },
+    "heatmap": [
+     0,
+     2,
+     2,
+     3,
+     3,
+     3,
+     1,
+     0,
+     3,
+     0,
+     1,
+     2,
+     4,
+     1,
+     1,
+     2,
+     1,
+     2,
+     0,
+     3,
+     2,
+     2,
+     3,
+     1,
+     1,
+     -1,
+     0,
+     0,
+     1,
+     -1,
+     0,
+     -1,
+     0,
+     0,
+     0,
+     -1,
+     2,
+     0,
+     0,
+     0,
+     -1,
+     -2,
+     -1,
+     -3,
+     -2,
+     -4,
+     0,
+     0,
+     -1,
+     -1,
+     -2,
+     -3,
+     -4,
+     -1,
+     -1,
+     0,
+     -1,
+     -1,
+     -2,
+     0,
+     -2,
+     -2,
+     -1,
+     0
+    ]
+   },
+   "motifs": {
+    "present": [
+     {
+      "type": "hanging",
+      "side": "black",
+      "squares": [
+       "f4"
+      ],
+      "description": "white bishop on f4 can be captured (by a cheaper piece)"
+     },
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "c4",
+       "d5",
+       "e6"
+      ],
+      "description": "black knight on d5 is pinned to the king by white bishop on c4"
+     },
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "e4",
+       "e5",
+       "e6"
+      ],
+      "description": "black pawn on e5 is pinned to the king by white queen on e4"
+     },
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "f4",
+       "e5",
+       "c7"
+      ],
+      "description": "black pawn on e5 is pinned to black knight on c7 by white bishop on f4"
+     }
+    ],
+    "created": [
+     {
+      "type": "pin",
+      "side": "white",
+      "squares": [
+       "f4",
+       "e5",
+       "c7"
+      ],
+      "description": "black pawn on e5 is pinned to black knight on c7 by white bishop on f4"
+     }
+    ],
+    "missed": []
+   },
+   "missed_motifs": [],
+   "critical": {
+    "is_critical": false,
+    "reasons": []
+   },
+   "comment": "Best move."
+  }
+ ],
+ "summary": {
+  "sides": {
+   "white": {
+    "accuracy": 94.5,
+    "moves": 12,
+    "counts": {
+     "best": 6,
+     "good": 1,
+     "great": 3,
+     "brilliant": 1,
+     "mistake": 1
+    },
+    "phase_accuracy": {
+     "opening": 93.3,
+     "middlegame": 100.0
+    }
+   },
+   "black": {
+    "accuracy": 96.4,
+    "moves": 11,
+    "counts": {
+     "excellent": 2,
+     "best": 5,
+     "inaccuracy": 1,
+     "great": 3
+    },
+    "phase_accuracy": {
+     "opening": 96.0,
+     "middlegame": 100.0
+    }
+   }
+  },
+  "critical": [
+   {
+    "ply": 9,
+    "reasons": [
+     "only_move"
+    ],
+    "san": "exd5",
+    "mover": "white"
+   },
+   {
+    "ply": 12,
+    "reasons": [
+     "only_move"
+    ],
+    "san": "Kxf7",
+    "mover": "black"
+   },
+   {
+    "ply": 13,
+    "reasons": [
+     "only_move"
+    ],
+    "san": "Qf3+",
+    "mover": "white"
+   },
+   {
+    "ply": 14,
+    "reasons": [
+     "only_move"
+    ],
+    "san": "Ke6",
+    "mover": "black"
+   },
+   {
+    "ply": 15,
+    "reasons": [
+     "only_move"
+    ],
+    "san": "Nc3",
+    "mover": "white"
+   },
+   {
+    "ply": 17,
+    "reasons": [
+     "turning_point"
+    ],
+    "san": "Qe4",
+    "mover": "white"
+   },
+   {
+    "ply": 22,
+    "reasons": [
+     "only_move"
+    ],
+    "san": "Nc7",
+    "mover": "black"
+   }
+  ],
+  "key_moments": [
+   17,
+   10
+  ],
+  "eval": [
+   {
+    "cp": 31,
+    "mate": null,
+    "win": 0.5285,
+    "terminal": null
+   },
+   {
+    "cp": 31,
+    "mate": null,
+    "win": 0.5285,
+    "terminal": null
+   },
+   {
+    "cp": 41,
+    "mate": null,
+    "win": 0.5377,
+    "terminal": null
+   },
+   {
+    "cp": 37,
+    "mate": null,
+    "win": 0.534,
+    "terminal": null
+   },
+   {
+    "cp": 40,
+    "mate": null,
+    "win": 0.5368,
+    "terminal": null
+   },
+   {
+    "cp": 10,
+    "mate": null,
+    "win": 0.5092,
+    "terminal": null
+   },
+   {
+    "cp": 19,
+    "mate": null,
+    "win": 0.5175,
+    "terminal": null
+   },
+   {
+    "cp": 6,
+    "mate": null,
+    "win": 0.5055,
+    "terminal": null
+   },
+   {
+    "cp": 25,
+    "mate": null,
+    "win": 0.523,
+    "terminal": null
+   },
+   {
+    "cp": 15,
+    "mate": null,
+    "win": 0.5138,
+    "terminal": null
+   },
+   {
+    "cp": 110,
+    "mate": null,
+    "win": 0.5999,
+    "terminal": null
+   },
+   {
+    "cp": 133,
+    "mate": null,
+    "win": 0.62,
+    "terminal": null
+   },
+   {
+    "cp": 80,
+    "mate": null,
+    "win": 0.5731,
+    "terminal": null
+   },
+   {
+    "cp": 84,
+    "mate": null,
+    "win": 0.5767,
+    "terminal": null
+   },
+   {
+    "cp": 73,
+    "mate": null,
+    "win": 0.5668,
+    "terminal": null
+   },
+   {
+    "cp": 101,
+    "mate": null,
+    "win": 0.5919,
+    "terminal": null
+   },
+   {
+    "cp": 130,
+    "mate": null,
+    "win": 0.6174,
+    "terminal": null
+   },
+   {
+    "cp": -62,
+    "mate": null,
+    "win": 0.4432,
+    "terminal": null
+   },
+   {
+    "cp": -86,
+    "mate": null,
+    "win": 0.4215,
+    "terminal": null
+   },
+   {
+    "cp": -84,
+    "mate": null,
+    "win": 0.4233,
+    "terminal": null
+   },
+   {
+    "cp": -87,
+    "mate": null,
+    "win": 0.4206,
+    "terminal": null
+   },
+   {
+    "cp": -82,
+    "mate": null,
+    "win": 0.4251,
+    "terminal": null
+   },
+   {
+    "cp": -67,
+    "mate": null,
+    "win": 0.4386,
+    "terminal": null
+   },
+   {
+    "cp": -74,
+    "mate": null,
+    "win": 0.4323,
+    "terminal": null
+   }
+  ],
+  "moments": [
+   {
+    "ply": 17,
+    "sentence": "White's Qe4 cost 17% win chance; O-O was the better move."
+   }
+  ]
+ }
+}

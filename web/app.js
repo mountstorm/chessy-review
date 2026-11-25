@@ -24,7 +24,6 @@ const hangTip = h => `${hangName(h)} can be captured${h.reason ? ` (${h.reason})
 // A classification icon. Symbols alone are cryptic, so every one carries its name as a tooltip and for screen readers
 // (decorative = true when the name is already printed right next to it).
 const badge = (k, decorative = false) => `<i class="badge b-${k}" style="min-width:18px;height:18px;font-size:10px" ${decorative ? 'aria-hidden="true"' : `role="img" title="${LABELS[k][1]}" aria-label="${LABELS[k][1]}"`}>${LABELS[k][0]}</i>`;
-const EXAMPLE = `[White "Alice"]\n[Black "Bob"]\n[Result "1-0"]\n[Opening "Italian Game"]\n\n1. e4 e5 2. Nf3 Nc6 3. Bc4 Nf6 4. Ng5 d5 5. exd5 Nxd5 6. Nxf7 Kxf7 7. Qf3+ Ke6 8. Nc3 Nb4 9. Qe4 c6 10. a3 Na6 11. d4 Nac7 12. Bf4 1-0`;
 
 /* ---------- state ---------- */
 const S = {
@@ -449,7 +448,7 @@ function renderAll() {
 
 /* ---------- game loading & analysis ---------- */
 function mainline(tree) { const out = []; let n = tree; while (n.children && n.children.length) { n = n.children[0]; out.push(n); } return out; }
-async function openGame(id, auto = false) {
+async function openGame(id, auto = false, example = null) {
   stopPlay(); if (S.abort) S.abort.abort();
   const g = S.hosted ? S.hostedGames[id] : await api('/api/games/' + id);
   Object.assign(S, { game: g, nodes: mainline(g.tree), moves: [], evals: [], summary: null, ply: 0, explore: null, chat: [], mastersFor: null, analyzing: false, follow: false, coachDraw: { arrows: [], hl: [] } });
@@ -457,6 +456,7 @@ async function openGame(id, auto = false) {
   S.flip = false; resetSel();
   $('#chat').innerHTML = '<div class="bubble sys">Ask about any position. The coach checks Stockfish first, then points at the board.</div>';
   show('review'); setTab('moves'); renderAll();
+  if (example) { $('#depthSel').value = [10, 14, 18].includes(example.depth) ? example.depth : 14; return replayExample(example); }
   const done = g.reviews.filter(r => r.complete).sort((a, b) => b.depth - a.depth)[0];
   if (done) { $('#depthSel').value = [10, 14, 18].includes(done.depth) ? done.depth : 14; runAnalysis(done.depth, done.multipv); }
   else if (g.cache) restoreAnalysis(g);                       // hosted: finished in this tab already, don't spend the engine again
@@ -473,12 +473,32 @@ function restoreAnalysis(g) {
   renderAll();
 }
 async function runAnalysis(depth, multipv = 3, force = false) {
+  const gid = S.game.id;
+  return withAnalysisUI(depth, multipv, (h, signal) =>
+    streamSSE(`/api/games/${gid}/analyze`, { depth, multipv, force, ...(S.hosted ? { pgn: S.game.pgn } : {}) }, h, signal));
+}
+// Plays a precomputed review (from /api/games/example) through the same handlers a live one uses, a move at a time so it
+// still looks like the game is being analyzed.
+const EXAMPLE_STEP_MS = 40;
+function replayExample(ex) {
+  return withAnalysisUI(ex.depth, ex.multipv, async (h, signal) => {
+    h.start({ eval: ex.start.eval, total: ex.moves.length, depth: ex.depth, replay: false });
+    for (const [i, m] of ex.moves.entries()) {
+      await new Promise(r => setTimeout(r, EXAMPLE_STEP_MS));
+      if (signal.aborted) throw new DOMException('aborted', 'AbortError');
+      h.move({ move: m, progress: { done: i + 1, total: ex.moves.length } });
+    }
+    h.summary({ summary: ex.summary }); h.done({});
+  });
+}
+// Everything around one review run, live or replayed: progress UI, state, and the final position. `work` gets the event handlers.
+async function withAnalysisUI(depth, multipv, work) {
   if (S.analyzing) return;
   const gid = S.game.id, run = ++S.runSeq; S.analyzing = true; S.follow = true; S.moves = []; S.evals = []; S.summary = null; S.abort = new AbortController();
   const btn = $('#analyzeBtn'), pr = $('#progress'), bar = $('#progressBar'), txt = $('#progressText');
   btn.disabled = true; pr.hidden = false; bar.style.width = '0'; txt.textContent = 'Starting engine…'; S.ply = 0; renderAll();
   try {
-    await streamSSE(`/api/games/${gid}/analyze`, { depth, multipv, force, ...(S.hosted ? { pgn: S.game.pgn } : {}) }, {
+    await work({
       start: d => { S.evals[0] = d.eval; txt.textContent = d.replay ? 'Loading saved review…' : `Analyzing ${d.total} moves at depth ${d.depth}…`; renderEval(); },
       move: d => {
         if (S.game.id !== gid) return;
@@ -627,17 +647,17 @@ async function loadLibrary() {
   $('#library').innerHTML = S.games.map(gameCard).join('');
   $$('#library .gcard').forEach(b => b.onclick = () => openGame(b.dataset.id, true).catch(e => toast(e.message)));
 }
-async function doImport(body, btn) {
+async function doImport(body, btn, example = false) {       // example: the built-in game with its precomputed review
   const who = (body.chesscom_username || body.lichess_username || '').trim();
   if (who) S.me = who;                    // so cards show the games from that player's side
   S.libTitle = who ? `Recent games for ${who}` : 'Your games';
   const msg = $('#importMsg'); msg.className = 'msg'; msg.textContent = ''; btn.disabled = true;
   const label = btn.textContent; if (btn.dataset.busy) btn.textContent = btn.dataset.busy;
   try {
-    const r = await api('/api/games/import', { method: 'POST', body });
+    const r = await api(example ? '/api/games/example' : '/api/games/import', { method: 'POST', body });
     if (r.hosted) { S.hosted = true; r.games.forEach(g => { S.hostedGames[g.id] = g; }); const ids = new Set(r.games.map(g => g.id)); S.games = [...r.games, ...S.games.filter(g => !ids.has(g.id))]; }
     await loadLibrary();
-    if (r.games.length === 1) await openGame(r.games[0].id, true);
+    if (r.games.length === 1) await openGame(r.games[0].id, true, r.example);
     else { msg.className = 'msg ok'; msg.textContent = `Imported ${r.games.length} games. Pick one below.`; }
   } catch (e) { msg.textContent = e instanceof TypeError && /fetch|network|load failed/i.test(e.message) ? "Couldn't reach Chessy's server. Check your connection and try again." : e.message; }
   btn.disabled = false; btn.textContent = label;
@@ -683,7 +703,7 @@ function init() {
   };
   $('#advToggle').onclick = () => { const open = $('#advanced').hidden; $('#advanced').hidden = !open; $('#advToggle').setAttribute('aria-expanded', open); if (open) $('#pgnText').focus(); };
   $('#importPgn').onclick = e => { const t = $('#pgnText').value.trim(); if (!t) return toast('Paste a PGN or some moves first.'); doImport({ pgn: t }, e.target); };
-  $('#loadExample').onclick = e => doImport({ pgn: EXAMPLE }, e.target);      // load, import and analyze in one click
+  $('#loadExample').onclick = e => doImport({}, e.target, true);      // load the game and replay its precomputed review in one click
   $('#pgnFile').onchange = async e => { const f = e.target.files[0]; if (f) $('#pgnText').value = await f.text(); };
   $('#bFirst').onclick = () => goTo(0); $('#bPrev').onclick = () => goTo(S.ply - 1); $('#bNext').onclick = () => goTo(S.ply + 1); $('#bLast').onclick = () => goTo(1e6);
   $('#bPlay').onclick = togglePlay; $('#bFlip').onclick = () => { S.flip = !S.flip; renderAll(); };

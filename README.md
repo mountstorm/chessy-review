@@ -98,9 +98,22 @@ app/engine/            async Stockfish pool, cache, win-prob, classifier, motifs
 app/coach/             agent loop, tools, prompts, provider adapters, offline coach, UI-action parser
 app/services/          PGN trees, Chess.com/Lichess importers, masters lookup, player analytics
 app/models/            Pydantic schemas + SQLAlchemy async models (SQLite)
+app/data/example.json  precomputed depth-18 review of the example game (generated, committed)
+tools/                 maintenance scripts (build_example.py)
 web/                   the UI (plain HTML/CSS/JS, served at /)
 tests/                 pytest suite (77 tests; engine tests skip if Stockfish is missing)
 ```
+
+## The example game
+"Try an example game" doesn't run the engine: it loads a precomputed depth-18 review from `app/data/example.json` and replays it move by move.
+Analysis is deterministic (every search starts from a clean engine), so regenerating gives the same file on any machine with the same Stockfish version:
+
+```bash
+.venv/bin/python tools/build_example.py      # ~1 min; writes app/data/example.json
+git add app/data/example.json
+```
+Regenerate after changing anything in the analysis output (move payload, summary, classifier, Stockfish version).
+`tests/test_example.py` fails with "example.json is stale" when the saved file no longer matches the live response format.
 
 ## Notes and limits
 - Analysis covers the **mainline**; variations are stored and returned in the tree, and any line can be explored on demand.

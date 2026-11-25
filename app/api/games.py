@@ -14,6 +14,7 @@ from ..models.db import Game, MoveRow, Review
 from ..models.schemas import AnalyzeRequest, GameSummary, ImportRequest
 from ..ratelimit import rate_limit
 from ..services import importers, masters, pgn as pgnlib
+from ..services.example import EXAMPLE_PGN, load_example
 from .deps import session, state
 from .sse import sse, sse_response
 
@@ -86,6 +87,32 @@ async def import_games(body: ImportRequest, request: Request) -> Dict[str, Any]:
             out.append(_summary(g, False))
         await s.commit()
     return {"games": [g.model_dump() for g in out]}
+
+
+@router.post("/example")
+async def import_example(request: Request) -> Dict[str, Any]:
+    """The built-in example game plus its precomputed review (no engine search). Same response as /import, plus
+    `example`: the review's events for the client to replay. With a database the review is saved too, so the coach,
+    the library and the insights treat it like any analyzed game."""
+    ex = load_example()
+    res = await import_games(ImportRequest(pgn=EXAMPLE_PGN), request)
+    if request.app.state.sessionmaker is not None:
+        gid = res["games"][0]["id"]
+        async with session(request) as s:
+            done = (await s.execute(select(Review).where(Review.game_id == gid, Review.depth == ex["depth"],
+                                                         Review.multipv == ex["multipv"]))).scalar_one_or_none()
+            if not (done and done.complete):
+                if done:
+                    await s.execute(delete(MoveRow).where(MoveRow.review_id == done.id))
+                    await s.delete(done)
+                    await s.flush()
+                review = Review(game_id=gid, depth=ex["depth"], multipv=ex["multipv"], complete=True, summary=ex["summary"])
+                s.add(review)
+                await s.flush()
+                s.add_all(_move_row(review.id, m) for m in ex["moves"])
+                await s.commit()
+        res["games"][0]["analyzed"] = True
+    return {**res, "example": {k: ex[k] for k in ("depth", "multipv", "start", "moves", "summary")}}
 
 
 @router.get("")
